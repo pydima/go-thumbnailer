@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/pydima/go-thumbnailer/src/handlers"
+	"github.com/pydima/go-thumbnailer/handlers"
 )
 
 func main() {

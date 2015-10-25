@@ -2,7 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -21,4 +23,14 @@ func UUID() string {
 	Random.Read(b)
 	return fmt.Sprintf("%x-%x-%x-%x-%x",
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+}
+
+func DownloadImage(u string) (io.ReadCloser, error) {
+	resp, err := http.Get(u)
+	return resp.Body, err
+}
+
+func ReadImage(p string) (io.ReadCloser, error) {
+	f, err := os.Open(p)
+	return f, err
 }
