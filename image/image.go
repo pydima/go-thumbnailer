@@ -4,15 +4,36 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+
+	"github.com/daddye/vips"
 )
 
 type Image struct{}
 
 func ProcessImage(i io.ReadCloser) (Image, err error) {
+	options := vips.Options{
+		Width:        100,
+		Height:       100,
+		Crop:         false,
+		Extend:       vips.EXTEND_WHITE,
+		Interpolator: vips.BILINEAR,
+		Gravity:      vips.CENTRE,
+		Quality:      95,
+	}
+
 	f, _ := os.Create("/home/home/res.jpg")
 	w := bufio.NewWriter(f)
-	io.Copy(w, i)
+	input, _ := ioutil.ReadAll(i)
+
+	buf, err := vips.Resize(input, options)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
+
+	w.Write(buf)
 	w.Flush()
 	fmt.Println("Done!")
 	return
