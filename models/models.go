@@ -9,9 +9,8 @@ import (
 )
 
 type Image struct {
-	ID int
-	OriginalPath string `sql:"type:varchar(255)"`
-	Identifier string
+	OriginalPath string `gorm:"primary_key" sql:"type:varchar(255)"`
+	Identifier string `gorm:"primary_key" sql:"type:varchar(255)"`
 	Path string `sql:"type:varchar(255)"`
 	CreatedAt time.Time
 }
