@@ -42,6 +42,16 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	db_i := models.Image{
+		OriginalPath: t.Path,
+		Identifier: t.Identifier,
+	}
+
+	if db_i.Exist(){
+		fmt.Println("This image is already exist.")
+		return
+	}
+
 	var i io.ReadCloser
 	if t.Path[:4] == "http" {
 		i, _ = utils.DownloadImage(t.Path)
@@ -54,11 +64,8 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Sorry.")
 	}
 
-	db_i := models.Image{
-		OriginalPath: t.Path,
-		Identifier: t.Identifier,
-		Path: path,
-	}
+	db_i.Path = path
+
 	models.Db.Create(&db_i)
 
 }
