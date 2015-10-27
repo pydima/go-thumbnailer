@@ -10,6 +10,7 @@ import (
 
 	"github.com/pydima/go-thumbnailer/image"
 	"github.com/pydima/go-thumbnailer/utils"
+	"github.com/pydima/go-thumbnailer/models"
 )
 
 type Task struct {
@@ -48,5 +49,16 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 		i, _ = utils.ReadImage(t.Path)
 	}
 
-	image.ProcessImage(i)
+	path, err := image.ProcessImage(i)
+	if err != nil {
+		log.Fatal("Sorry.")
+	}
+
+	db_i := models.Image{
+		OriginalPath: t.Path,
+		Identifier: t.Identifier,
+		Path: path,
+	}
+	models.Db.Create(&db_i)
+
 }

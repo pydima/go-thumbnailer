@@ -12,7 +12,7 @@ import (
 
 type Image struct{}
 
-func ProcessImage(i io.ReadCloser) (Image, err error) {
+func ProcessImage(i io.ReadCloser) (path string, err error) {
 	options := vips.Options{
 		Width:        100,
 		Height:       100,
@@ -23,7 +23,9 @@ func ProcessImage(i io.ReadCloser) (Image, err error) {
 		Quality:      95,
 	}
 
-	f, _ := os.Create("/home/home/res.jpg")
+	path = "res.jpg"
+
+	f, _ := os.Create(path)
 	w := bufio.NewWriter(f)
 	input, _ := ioutil.ReadAll(i)
 
