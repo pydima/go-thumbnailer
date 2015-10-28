@@ -13,11 +13,15 @@ import (
 	"github.com/pydima/go-thumbnailer/utils"
 )
 
-type Task struct {
+type ImageSource struct {
 	Path       string
 	Identifier string
-	Delay      bool
-	TaskID     string
+}
+
+type Task struct {
+	Images []ImageSource
+	Delay  bool
+	TaskID string
 }
 
 func checkParams(t *Task) (err error) {
@@ -43,30 +47,33 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	db_i := models.Image{
-		OriginalPath: t.Path,
-		Identifier:   t.Identifier,
+	for _, is := range t.Images {
+
+		db_i := models.Image{
+			OriginalPath: is.Path,
+			Identifier:   is.Identifier,
+		}
+
+		if db_i.Exist() {
+			fmt.Println("This image is already exist.")
+			return
+		}
+
+		var i io.ReadCloser
+		if is.Path[:4] == "http" {
+			i, _ = utils.DownloadImage(is.Path)
+		} else {
+			i, _ = utils.ReadImage(is.Path)
+		}
+
+		path, err := image.ProcessImage(i)
+		if err != nil {
+			log.Fatal("Sorry.")
+		}
+
+		db_i.Path = path
+
+		models.Db.Create(&db_i)
 	}
-
-	if db_i.Exist() {
-		fmt.Println("This image is already exist.")
-		return
-	}
-
-	var i io.ReadCloser
-	if t.Path[:4] == "http" {
-		i, _ = utils.DownloadImage(t.Path)
-	} else {
-		i, _ = utils.ReadImage(t.Path)
-	}
-
-	path, err := image.ProcessImage(i)
-	if err != nil {
-		log.Fatal("Sorry.")
-	}
-
-	db_i.Path = path
-
-	models.Db.Create(&db_i)
 
 }

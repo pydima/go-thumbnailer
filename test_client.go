@@ -6,18 +6,21 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/pydima/go-thumbnailer/handlers"
 )
 
 func main() {
-	s := struct {
-		Path  string
-		Delay bool
-	}{
-		"http://ecx.images-amazon.com/images/I/51eDwv7tCtL._SX442_BO1,204,203,200_.jpg",
-		false,
-	}
+	var (
+		image_source []handlers.ImageSource
+		task         handlers.Task
+	)
 
-	data, err := json.Marshal(s)
+	image_source = append(image_source, handlers.ImageSource{"http://ecx.images-amazon.com/images/I/51eDwv7tCtL._SX442_BO1,204,203,200_.jpg", ""})
+	task.Images = image_source
+	task.Delay = false
+
+	data, err := json.Marshal(task)
 	if err != nil {
 		os.Exit(1)
 	}
