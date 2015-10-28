@@ -9,19 +9,20 @@ import (
 	"os"
 
 	"github.com/pydima/go-thumbnailer/image"
-	"github.com/pydima/go-thumbnailer/utils"
 	"github.com/pydima/go-thumbnailer/models"
+	"github.com/pydima/go-thumbnailer/utils"
 )
 
 type Task struct {
 	Path       string
-	Delay      bool
 	Identifier string
+	Delay      bool
+	TaskID     string
 }
 
 func checkParams(t *Task) (err error) {
-	if t.Identifier == "" {
-		t.Identifier = utils.UUID()
+	if t.TaskID == "" {
+		t.TaskID = utils.UUID()
 	}
 	return
 }
@@ -44,10 +45,10 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 
 	db_i := models.Image{
 		OriginalPath: t.Path,
-		Identifier: t.Identifier,
+		Identifier:   t.Identifier,
 	}
 
-	if db_i.Exist(){
+	if db_i.Exist() {
 		fmt.Println("This image is already exist.")
 		return
 	}
