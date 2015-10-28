@@ -31,6 +31,15 @@ func checkParams(t *Task) (err error) {
 	return
 }
 
+func get_image(is ImageSource) (i io.ReadCloser) {
+	if is.Path[:4] == "http" {
+		i, _ = utils.DownloadImage(is.Path)
+	} else {
+		i, _ = utils.ReadImage(is.Path)
+	}
+	return
+}
+
 func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 	var t Task
 	d := json.NewDecoder(r.Body)
@@ -59,14 +68,13 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var i io.ReadCloser
-		if is.Path[:4] == "http" {
-			i, _ = utils.DownloadImage(is.Path)
-		} else {
-			i, _ = utils.ReadImage(is.Path)
-		}
+		s := make(chan io.ReadCloser, 1)
+		go func(s chan<- io.ReadCloser) {
+			i := get_image(is)
+			s <- i
+		}(s)
 
-		path, err := image.ProcessImage(i)
+		path, err := image.ProcessImage(<-s)
 		if err != nil {
 			log.Fatal("Sorry.")
 		}
