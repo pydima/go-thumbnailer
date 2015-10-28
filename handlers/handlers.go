@@ -69,10 +69,10 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s := make(chan io.ReadCloser, 1)
-		go func(s chan<- io.ReadCloser) {
+		go func() {
 			i := get_image(is)
 			s <- i
-		}(s)
+		}()
 
 		path, err := image.ProcessImage(<-s)
 		if err != nil {
