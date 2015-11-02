@@ -1,6 +1,8 @@
 package tasks
 
 import (
+	"log"
+
 	"github.com/pydima/go-thumbnailer/config"
 )
 
@@ -9,8 +11,13 @@ var Backend Tasker
 func init() {
 	bt := config.Base.TaskBackend
 
-	if bt == "Memory" {
+	switch bt {
+	case "Memory":
 		Backend = &MemoryBackend{make(chan *Task)}
+	case "RabbitMQ":
+		Backend = &RabbitMQBackend{}
+	default:
+		log.Fatal("Unknown backend.")
 	}
 }
 
