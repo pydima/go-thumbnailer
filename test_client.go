@@ -7,18 +7,17 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pydima/go-thumbnailer/handlers"
+	"github.com/pydima/go-thumbnailer/tasks"
 )
 
 func main() {
 	var (
-		image_source []handlers.ImageSource
-		task         handlers.Task
+		image_source []tasks.ImageSource
+		task         tasks.Task
 	)
 
-	image_source = append(image_source, handlers.ImageSource{"http://ecx.images-amazon.com/images/I/51eDwv7tCtL._SX442_BO1,204,203,200_.jpg", ""})
+	image_source = append(image_source, tasks.ImageSource{"http://ecx.images-amazon.com/images/I/51eDwv7tCtL._SX442_BO1,204,203,200_.jpg", ""})
 	task.Images = image_source
-	task.Delay = false
 
 	data, err := json.Marshal(task)
 	if err != nil {

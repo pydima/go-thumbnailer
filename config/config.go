@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 )
@@ -13,7 +12,8 @@ type ImageParam struct {
 }
 
 type Config struct {
-	ImageParam ImageParam
+	ImageParam  ImageParam
+	TaskBackend string
 }
 
 var Base Config
@@ -24,5 +24,4 @@ func init() {
 	if err := decoder.Decode(&Base); err != nil {
 		log.Fatalln("Cannot read config. ", err)
 	}
-	fmt.Println(Base.ImageParam.Width)
 }

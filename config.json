@@ -2,5 +2,6 @@
 	"ImageParam": {
 		"Width": 600,
 		"Height": 800
-	}
+	},
+	"TaskBackend": "Memory"
 }
