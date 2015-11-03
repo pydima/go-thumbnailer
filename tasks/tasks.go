@@ -15,7 +15,8 @@ func init() {
 	case "Memory":
 		Backend = &MemoryBackend{make(chan *Task)}
 	case "RabbitMQ":
-		Backend = &RabbitMQBackend{}
+		conn, ch, q := get_connection()
+		Backend = &RabbitMQBackend{conn, ch, q}
 	default:
 		log.Fatal("Unknown backend.")
 	}
@@ -34,4 +35,5 @@ type Task struct {
 type Tasker interface {
 	Get() *Task
 	Put(*Task)
+	Close()
 }

@@ -13,3 +13,5 @@ func (mb *MemoryBackend) Put(t *Task) {
 	mb.tasks <- t
 	return
 }
+
+func (mb *MemoryBackend) Close() {}

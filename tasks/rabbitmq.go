@@ -9,6 +9,7 @@ import (
 )
 
 type RabbitMQBackend struct {
+	conn  *amqp.Connection
 	tasks *amqp.Channel
 	queue *amqp.Queue
 }
@@ -20,14 +21,12 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func get_connection() (*amqp.Channel, *amqp.Queue) {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+func get_connection() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:32769/")
 	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
-	// defer ch.Close()  TODO: Don't forget to close the channel
 
 	q, err := ch.QueueDeclare(
 		"tasks", // name
@@ -38,7 +37,7 @@ func get_connection() (*amqp.Channel, *amqp.Queue) {
 		nil,     // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
-	return ch, &q
+	return conn, ch, &q
 }
 
 func (mb *RabbitMQBackend) Get() *Task {
@@ -55,7 +54,6 @@ func (mb *RabbitMQBackend) Get() *Task {
 
 	var t *Task
 	msg := <-msgs
-	log.Printf("Received a message: %s", msg.Body)
 	err = json.Unmarshal(msg.Body, &t)
 	failOnError(err, "Failed to unmarshal data")
 	return t
@@ -76,4 +74,9 @@ func (mb *RabbitMQBackend) Put(t *Task) {
 		})
 	failOnError(err, "Failed to publish a message")
 	return
+}
+
+func (mb *RabbitMQBackend) Close() {
+	mb.tasks.Close()
+	mb.conn.Close()
 }
