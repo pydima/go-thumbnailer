@@ -18,6 +18,7 @@ func main() {
 
 	image_source = append(image_source, tasks.ImageSource{"http://ecx.images-amazon.com/images/I/51eDwv7tCtL._SX442_BO1,204,203,200_.jpg", ""})
 	task.Images = image_source
+	task.NotifyUrl = "http://localhost:8000/"
 
 	data, err := json.Marshal(task)
 	if err != nil {

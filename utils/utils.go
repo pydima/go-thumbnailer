@@ -1,11 +1,15 @@
 package utils
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"log"
+	"net/http"
 	"os"
+
+	"github.com/pydima/go-thumbnailer/image"
 )
 
 var Random *os.File
@@ -33,4 +37,13 @@ func DownloadImage(u string) (io.ReadCloser, error) {
 func ReadImage(p string) (io.ReadCloser, error) {
 	f, err := os.Open(p)
 	return f, err
+}
+
+func Notify(url string, images []image.Image) (err error) {
+	data, err := json.Marshal(images)
+	if err != nil {
+		return
+	}
+	http.Post(url, "application/json", bytes.NewReader(data))
+	return
 }

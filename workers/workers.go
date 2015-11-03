@@ -1,7 +1,6 @@
 package workers
 
 import (
-	"fmt"
 	"io"
 	"log"
 
@@ -38,8 +37,8 @@ func process(b tasks.Tasker) {
 		}
 
 		if db_i.Exist() {
-			fmt.Println("This image is already exist.")
-			return
+			log.Println("This image is already exist.")
+			break
 		}
 
 		s := make(chan io.ReadCloser, 1)
@@ -57,4 +56,6 @@ func process(b tasks.Tasker) {
 
 		models.Db.Create(&db_i)
 	}
+	var i []image.Image
+	go utils.Notify(t.NotifyUrl, i)
 }

@@ -10,6 +10,12 @@ import (
 	"github.com/daddye/vips"
 )
 
+type Image struct {
+	width  uint
+	height uint
+	path   string
+}
+
 func ProcessImage(i io.ReadCloser) (path string, err error) {
 	options := vips.Options{
 		Width:        100,

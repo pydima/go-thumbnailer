@@ -28,8 +28,9 @@ type ImageSource struct {
 }
 
 type Task struct {
-	Images []ImageSource
-	TaskID string
+	Images    []ImageSource
+	TaskID    string
+	NotifyUrl string
 }
 
 type Tasker interface {
