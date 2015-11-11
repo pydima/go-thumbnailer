@@ -4,10 +4,10 @@ import (
 	"testing"
 )
 
-func TestPutGetMemory(t *testing.T) {
+func TestPutGetRabbitMQ(t *testing.T) {
 	task := &Task{TaskID: "test_task"}
 
-	b, err := NewBackend("Memory")
+	b, err := NewBackend("RabbitMQ")
 	if err != nil {
 		t.Error(err)
 	}

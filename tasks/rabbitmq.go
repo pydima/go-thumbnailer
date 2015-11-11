@@ -57,7 +57,6 @@ func (mb *RabbitMQBackend) Get() *Task {
 	err = json.Unmarshal(msg.Body, &t)
 	failOnError(err, "Failed to unmarshal data")
 	return t
-
 }
 
 func (mb *RabbitMQBackend) Put(t *Task) {
