@@ -3,5 +3,7 @@
 		"Width": 600,
 		"Height": 800
 	},
-	"TaskBackend": "Memory"
+	"TaskBackend": "Memory",
+	"Host": "localhost",
+	"Port": 8080
 }

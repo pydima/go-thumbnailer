@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/pydima/go-thumbnailer/config"
 	"github.com/pydima/go-thumbnailer/handlers"
 	"github.com/pydima/go-thumbnailer/tasks"
 	"github.com/pydima/go-thumbnailer/workers"
@@ -15,5 +17,7 @@ func main() {
 
 	workers.Run()
 
-	http.ListenAndServe(":8080", nil)
+	host := config.Base.Host
+	port := config.Base.Port
+	http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil)
 }
