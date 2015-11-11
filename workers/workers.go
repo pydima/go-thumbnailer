@@ -3,6 +3,7 @@ package workers
 import (
 	"io"
 	"log"
+	"os"
 
 	"github.com/pydima/go-thumbnailer/image"
 	"github.com/pydima/go-thumbnailer/models"
@@ -22,7 +23,7 @@ func get_image(is tasks.ImageSource) (i io.ReadCloser) {
 	if is.Path[:4] == "http" {
 		i, _ = utils.DownloadImage(is.Path)
 	} else {
-		i, _ = utils.ReadImage(is.Path)
+		i, _ = os.Open(is.Path)
 	}
 	return
 }

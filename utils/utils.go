@@ -34,11 +34,6 @@ func DownloadImage(u string) (io.ReadCloser, error) {
 	return resp.Body, err
 }
 
-func ReadImage(p string) (io.ReadCloser, error) {
-	f, err := os.Open(p)
-	return f, err
-}
-
 func Notify(url string, images []image.Image) (err error) {
 	data, err := json.Marshal(images)
 	if err != nil {
