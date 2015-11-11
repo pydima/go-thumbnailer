@@ -18,10 +18,21 @@ type Config struct {
 
 var Base Config
 
-func init() {
-	f, _ := os.Open("/etc/fyndiq/config.json")
+func decodeConfig(path string, c *Config) (err error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
 	decoder := json.NewDecoder(f)
-	if err := decoder.Decode(&Base); err != nil {
+	err = decoder.Decode(c)
+	return
+}
+
+func init() {
+	err := decodeConfig("/etc/fyndiq/config.json", &Base)
+	if err != nil {
 		log.Fatalln("Cannot read config. ", err)
 	}
 }
