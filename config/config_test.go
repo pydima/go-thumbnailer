@@ -12,6 +12,8 @@ func createTempConfig(name string) {
 	conf := Config{
 		ImageParam{Width: 800, Height: 600},
 		"Memory",
+		"localhost",
+		8080,
 	}
 	j, _ := json.Marshal(conf)
 	ioutil.WriteFile(name, j, 0644)
