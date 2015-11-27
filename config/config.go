@@ -33,7 +33,7 @@ func decodeConfig(path string, c *Config) (err error) {
 }
 
 func init() {
-	err := decodeConfig("/etc/fyndiq/config.json", &Base)
+	err := decodeConfig("/etc/go_thumbnailer/config.json", &Base)
 	if err != nil {
 		log.Fatalln("Cannot read config. ", err)
 	}
