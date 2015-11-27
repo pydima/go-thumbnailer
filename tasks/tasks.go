@@ -38,7 +38,7 @@ type Tasker interface {
 func NewBackend(bType string) (t Tasker, err error) {
 	switch bType {
 	case "Memory":
-		t = &MemoryBackend{make(chan *Task)}
+		t = &MemoryBackend{make(chan *Task, 100)}
 	case "RabbitMQ":
 		conn, ch, q := get_connection()
 		t = &RabbitMQBackend{conn, ch, q}

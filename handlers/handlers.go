@@ -24,4 +24,5 @@ func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 	tasks.Backend.Put(&t)
+	w.WriteHeader(http.StatusCreated)
 }
