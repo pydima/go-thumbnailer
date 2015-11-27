@@ -5,3 +5,6 @@ build:
 
 run:
 	docker run -ti --rm -v ${CURDIR}:/go/src/github.com/pydima/go-thumbnailer/ pydima/go-thumbnailer 
+
+test:
+	go test ./...
