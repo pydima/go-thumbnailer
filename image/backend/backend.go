@@ -1,4 +1,4 @@
-package image
+package backend
 
 type ImageBaсkander interface {
 	Exists(hash string) bool

@@ -1,4 +1,4 @@
-package image
+package backend
 
 import (
 	"io/ioutil"
