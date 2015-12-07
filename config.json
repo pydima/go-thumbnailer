@@ -5,5 +5,6 @@
 	},
 	"TaskBackend": "Memory",
 	"Host": "localhost",
-	"Port": 8080
+	"Port": 8080,
+	"ValidExtensions": ["jpg", "jpeg", "png"]
 }

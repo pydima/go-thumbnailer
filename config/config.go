@@ -12,10 +12,11 @@ type ImageParam struct {
 }
 
 type Config struct {
-	ImageParam  ImageParam
-	TaskBackend string
-	Host        string
-	Port        int
+	ImageParam      ImageParam
+	TaskBackend     string
+	Host            string
+	Port            int
+	ValidExtensions []string
 }
 
 var Base Config

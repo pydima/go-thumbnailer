@@ -6,14 +6,34 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/daddye/vips"
+
+	"github.com/pydima/go-thumbnailer/config"
 )
 
 type Image struct {
 	width  uint
 	height uint
 	path   string
+}
+
+type InvalidExtension struct {
+	err string
+}
+
+func (e InvalidExtension) Error() string {
+	return e.err
+}
+
+func checkExtension(n string) error {
+	for _, ext := range config.Base.ValidExtensions {
+		if strings.HasSuffix(strings.ToLower(n), ext) {
+			return nil
+		}
+	}
+	return InvalidExtension{fmt.Sprintf("Cannot handle %s extension")}
 }
 
 func ProcessImage(i io.ReadCloser) (path string, err error) {
