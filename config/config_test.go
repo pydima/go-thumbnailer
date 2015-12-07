@@ -10,11 +10,8 @@ import (
 
 func createTempConfig(name string) {
 	conf := Config{
-		ImageParam{Width: 800, Height: 600},
-		"Memory",
-		"localhost",
-		8080,
-		[]string{"jpg", "jpeg", "png"},
+		ImageParam:  ImageParam{Width: 800, Height: 600},
+		TaskBackend: "Memory",
 	}
 	j, _ := json.Marshal(conf)
 	ioutil.WriteFile(name, j, 0644)
