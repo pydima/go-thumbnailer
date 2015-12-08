@@ -4,9 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/daddye/vips"
@@ -49,24 +54,30 @@ func checkExtension(n string) error {
 			return nil
 		}
 	}
-	return InvalidImage{fmt.Sprintf("Cannot handle %s extension")}
+	return InvalidImage{fmt.Sprintf("Extension %s is not supported.", filepath.Ext(n))}
 }
 
-func checkImageFormat(b []byte) ImageType {
-	if len(b) < 2 {
+func checkImageFormat(img []byte) ImageType {
+	if len(img) < 2 {
 		return UNKNOWN
 	}
 
 	switch {
-	case bytes.Equal(b[:2], MARKER_JPG):
+	case bytes.Equal(img[:2], MARKER_JPG):
 		return JPG
-	case bytes.Equal(b[:2], MARKER_PNG):
+	case bytes.Equal(img[:2], MARKER_PNG):
 		return PNG
-	case bytes.Equal(b[:2], MARKER_GIF):
+	case bytes.Equal(img[:2], MARKER_GIF):
 		return GIF
 	default:
 		return UNKNOWN
 	}
+}
+
+func getImageDimensions(img []byte) (width, height int, err error) {
+	r := bytes.NewReader(img)
+	conf, _, err := image.DecodeConfig(r)
+	return conf.Width, conf.Height, err
 }
 
 func ProcessImage(i io.ReadCloser) (path string, err error) {

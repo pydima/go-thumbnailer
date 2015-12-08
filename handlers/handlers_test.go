@@ -17,7 +17,7 @@ func TestCreateUser(t *testing.T) {
 		task         tasks.Task
 	)
 
-	image_source = append(image_source, tasks.ImageSource{"http://random_path_to_image.jpg", ""})
+	image_source = append(image_source, tasks.ImageSource{Path: "http://random_path_to_image.jpg", Identifier: ""})
 	task.Images = image_source
 	task.NotifyUrl = "http://localhost:8000/"
 	task.TaskID = "Random ID"
