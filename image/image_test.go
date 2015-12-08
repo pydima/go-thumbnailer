@@ -88,3 +88,20 @@ func TestGetImageDimensions(t *testing.T) {
 		t.Errorf("Should return an error, since cannot get dimensions.")
 	}
 }
+
+func TestConvertGifToPng(t *testing.T) {
+	b := readAndCheckFile("gif.gif", t)
+	res, err := convertGifToPng(b)
+	if err != nil {
+		t.Errorf("Cannot convert image to png.")
+	}
+	if f := checkImageFormat(res); f != PNG {
+		t.Errorf("Convertation failed.")
+	}
+
+	b = readAndCheckFile("png.png", t)
+	res, err = convertGifToPng(b)
+	if err == nil {
+		t.Errorf("Successfully converted png, but should support only gif.")
+	}
+}

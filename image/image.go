@@ -5,9 +5,9 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	_ "image/gif"
+	"image/gif"
 	_ "image/jpeg"
-	_ "image/png"
+	"image/png"
 	"io"
 	"io/ioutil"
 	"os"
@@ -78,6 +78,23 @@ func getImageDimensions(img []byte) (width, height int, err error) {
 	r := bytes.NewReader(img)
 	conf, _, err := image.DecodeConfig(r)
 	return conf.Width, conf.Height, err
+}
+
+// vips doesn't support gif natively, so have to convert it with slow standart library
+func convertGifToPng(img []byte) ([]byte, error) {
+	r := bytes.NewReader(img)
+	i, err := gif.Decode(r)
+	if err != nil {
+		return nil, err
+	}
+
+	res := new(bytes.Buffer)
+	err = png.Encode(res, i)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Bytes(), nil
 }
 
 func ProcessImage(i io.ReadCloser) (path string, err error) {
