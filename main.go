@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/pydima/go-thumbnailer/config"
@@ -19,5 +20,5 @@ func main() {
 
 	host := config.Base.Host
 	port := config.Base.Port
-	http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil))
 }
