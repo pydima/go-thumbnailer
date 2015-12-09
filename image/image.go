@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/daddye/vips"
+	"github.com/h2non/bimg"
 
 	"github.com/pydima/go-thumbnailer/config"
 )
@@ -97,15 +97,16 @@ func convertGifToPng(img []byte) ([]byte, error) {
 	return res.Bytes(), nil
 }
 
+func createThumbnail(img []byte, opts bimg.Options) ([]byte, error) {
+	return bimg.Resize(img, opts)
+}
+
 func ProcessImage(i io.ReadCloser) (path string, err error) {
-	options := vips.Options{
-		Width:        100,
-		Height:       100,
-		Crop:         true,
-		Extend:       vips.EXTEND_WHITE,
-		Interpolator: vips.BILINEAR,
-		Gravity:      vips.CENTRE,
-		Quality:      95,
+	options := bimg.Options{
+		Width:   100,
+		Height:  100,
+		Crop:    true,
+		Quality: 95,
 	}
 
 	path = "res.jpg"
@@ -114,7 +115,7 @@ func ProcessImage(i io.ReadCloser) (path string, err error) {
 	w := bufio.NewWriter(f)
 	input, _ := ioutil.ReadAll(i)
 
-	buf, err := vips.Resize(input, options)
+	buf, err := bimg.Resize(input, options)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return

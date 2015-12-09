@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/h2non/bimg"
+
 	"github.com/pydima/go-thumbnailer/config"
 )
 
@@ -66,9 +68,10 @@ func checkDimensions(b []byte, width, height int, t *testing.T) {
 	w, h, err := getImageDimensions(b)
 	if err != nil {
 		t.Errorf("Cannot get dimensions.")
+		return
 	}
 	if w != width || h != height {
-		t.Errorf("Got invalid dimensions, width: %d, height: %d", width, height)
+		t.Errorf("Got invalid dimensions, width: %d, height: %d", w, h)
 	}
 }
 
@@ -104,4 +107,20 @@ func TestConvertGifToPng(t *testing.T) {
 	if err == nil {
 		t.Errorf("Successfully converted png, but should support only gif.")
 	}
+}
+
+func TestCreateThumbnail(t *testing.T) {
+	options := bimg.Options{
+		Width:   100,
+		Height:  100,
+		Crop:    true,
+		Quality: 95,
+	}
+
+	b := readAndCheckFile("png.png", t)
+	res, err := createThumbnail(b, options)
+	if err != nil {
+		t.Errorf("Got error: %s", err)
+	}
+	checkDimensions(res, 100, 100, t)
 }
