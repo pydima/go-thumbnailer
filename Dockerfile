@@ -3,8 +3,9 @@ MAINTAINER Dmitry Vorobev <dimahabr@gmail.com>
 
 # update packages, install dependencies and set GOPATH
 RUN apt-get update -q
-RUN apt-get install -qy curl libvips-dev git rabbitmq-server
+RUN apt-get install -qy curl git rabbitmq-server pkg-config
 RUN curl -s https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz | tar -v -C /usr/local -xz
+RUN curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash - # install libvips
 ENV PATH /usr/local/go/bin:/go/bin:$PATH
 ENV GOPATH /go
 
