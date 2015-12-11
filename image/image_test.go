@@ -64,26 +64,38 @@ func TestCheckImageFormat(t *testing.T) {
 	}
 }
 
-func checkDimensions(b []byte, width, height int, t *testing.T) {
+func checkDimensions(b []byte, width, height int, t *testing.T, exact bool) {
 	w, h, err := getImageDimensions(b)
 	if err != nil {
 		t.Errorf("Cannot get dimensions.")
 		return
 	}
-	if w != width || h != height {
+
+	var invalid bool
+	if exact {
+		if w != width || h != height {
+			invalid = true
+		}
+	} else {
+		if w != width && h != height {
+			invalid = true
+		}
+	}
+
+	if invalid {
 		t.Errorf("Got invalid dimensions, width: %d, height: %d", w, h)
 	}
 }
 
 func TestGetImageDimensions(t *testing.T) {
 	b := readAndCheckFile("jpg.jpg", t)
-	checkDimensions(b, 1431, 901, t)
+	checkDimensions(b, 1431, 901, t, true)
 
 	b = readAndCheckFile("png.png", t)
-	checkDimensions(b, 1634, 2224, t)
+	checkDimensions(b, 1634, 2224, t, true)
 
 	b = readAndCheckFile("gif.gif", t)
-	checkDimensions(b, 450, 159, t)
+	checkDimensions(b, 450, 159, t, true)
 
 	b = readAndCheckFile("bmp.bmp", t)
 	_, _, err := getImageDimensions(b)
@@ -113,14 +125,26 @@ func TestCreateThumbnail(t *testing.T) {
 	options := bimg.Options{
 		Width:   100,
 		Height:  100,
-		Crop:    true,
+		Enlarge: true,
 		Quality: 95,
 	}
 
+	b := readAndCheckFile("png.png", t)
+	res, err := createThumbnail(b, &options)
+	if err != nil {
+		t.Errorf("Got error: %s", err)
+	}
+	checkDimensions(res, 100, 100, t, false)
+}
+
+// if Options are empty - should use default values
+func TestCreateDefaultThumbnail(t *testing.T) {
+	var options *bimg.Options
 	b := readAndCheckFile("png.png", t)
 	res, err := createThumbnail(b, options)
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}
-	checkDimensions(res, 100, 100, t)
+
+	checkDimensions(res, config.Base.ImageParam.Width, config.Base.ImageParam.Height, t, false)
 }

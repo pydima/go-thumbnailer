@@ -97,8 +97,11 @@ func convertGifToPng(img []byte) ([]byte, error) {
 	return res.Bytes(), nil
 }
 
-func createThumbnail(img []byte, opts bimg.Options) ([]byte, error) {
-	return bimg.Resize(img, opts)
+func createThumbnail(img []byte, opts *bimg.Options) ([]byte, error) {
+	if opts == nil {
+		opts = &config.Base.ImageParam
+	}
+	return bimg.Resize(img, *opts)
 }
 
 func ProcessImage(i io.ReadCloser) (path string, err error) {
