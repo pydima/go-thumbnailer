@@ -6,11 +6,13 @@ import (
 	"os"
 	"syscall"
 	"testing"
+
+	"github.com/h2non/bimg"
 )
 
 func createTempConfig(name string) {
 	conf := Config{
-		ImageParam:  ImageParam{Width: 800, Height: 600},
+		ImageParam:  bimg.Options{Width: 800, Height: 600},
 		TaskBackend: "Memory",
 	}
 	j, _ := json.Marshal(conf)

@@ -4,15 +4,12 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+
+	"github.com/h2non/bimg"
 )
 
-type ImageParam struct {
-	Width  uint
-	Height uint
-}
-
 type Config struct {
-	ImageParam      ImageParam
+	ImageParam      bimg.Options
 	TaskBackend     string
 	Host            string
 	Port            int

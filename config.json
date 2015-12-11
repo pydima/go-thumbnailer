@@ -1,7 +1,8 @@
 {
 	"ImageParam": {
 		"Width": 600,
-		"Height": 800
+		"Height": 800,
+		"Enlarge": true
 	},
 	"TaskBackend": "Memory",
 	"Host": "localhost",
