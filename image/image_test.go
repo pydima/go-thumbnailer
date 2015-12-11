@@ -139,8 +139,16 @@ func TestCreateThumbnail(t *testing.T) {
 }
 
 func TestConvertJpgToPng(t *testing.T) {
+	options := bimg.Options{
+		Width:      100,
+		Height:     100,
+		Enlarge:    true,
+		Quality:    95,
+		Background: bimg.Color{255, 255, 255},
+		Type:       3,
+	}
 	b := readAndCheckFile("jpg.jpg", t)
-	res, err := createThumbnail(b, &config.Base.ImageParam)
+	res, err := createThumbnail(b, &options)
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}
