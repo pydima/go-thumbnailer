@@ -137,3 +137,14 @@ func TestCreateThumbnail(t *testing.T) {
 	}
 	checkDimensions(res, 100, 100, t, false)
 }
+
+func TestConvertJpgToPng(t *testing.T) {
+	b := readAndCheckFile("jpg.jpg", t)
+	res, err := createThumbnail(b, &config.Base.ImageParam)
+	if err != nil {
+		t.Errorf("Got error: %s", err)
+	}
+	if f := checkImageFormat(res); f != PNG {
+		t.Errorf("Invalid image format.")
+	}
+}
