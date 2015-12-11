@@ -98,9 +98,6 @@ func convertGifToPng(img []byte) ([]byte, error) {
 }
 
 func createThumbnail(img []byte, opts *bimg.Options) ([]byte, error) {
-	if opts == nil {
-		opts = &config.Base.ImageParam
-	}
 	return bimg.Resize(img, *opts)
 }
 

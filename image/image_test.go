@@ -136,15 +136,3 @@ func TestCreateThumbnail(t *testing.T) {
 	}
 	checkDimensions(res, 100, 100, t, false)
 }
-
-// if Options are empty - should use default values
-func TestCreateDefaultThumbnail(t *testing.T) {
-	var options *bimg.Options
-	b := readAndCheckFile("png.png", t)
-	res, err := createThumbnail(b, options)
-	if err != nil {
-		t.Errorf("Got error: %s", err)
-	}
-
-	checkDimensions(res, config.Base.ImageParam.Width, config.Base.ImageParam.Height, t, false)
-}
