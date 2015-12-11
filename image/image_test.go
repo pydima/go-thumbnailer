@@ -123,10 +123,11 @@ func TestConvertGifToPng(t *testing.T) {
 
 func TestCreateThumbnail(t *testing.T) {
 	options := bimg.Options{
-		Width:   100,
-		Height:  100,
-		Enlarge: true,
-		Quality: 95,
+		Width:      100,
+		Height:     100,
+		Enlarge:    true,
+		Quality:    95,
+		Background: bimg.Color{255, 255, 255},
 	}
 
 	b := readAndCheckFile("png.png", t)

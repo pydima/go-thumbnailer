@@ -2,7 +2,9 @@
 	"ImageParam": {
 		"Width": 600,
 		"Height": 800,
-		"Enlarge": true
+		"Enlarge": true,
+		"Quality": 95,
+		"Background": {"R": 255, "G": 255, "B": 255}
 	},
 	"TaskBackend": "Memory",
 	"Host": "localhost",

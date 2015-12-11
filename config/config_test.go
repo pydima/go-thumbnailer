@@ -10,9 +10,11 @@ import (
 	"github.com/h2non/bimg"
 )
 
+var colorWhite = bimg.Color{255, 255, 255}
+
 func createTempConfig(name string) {
 	conf := Config{
-		ImageParam:  bimg.Options{Width: 800, Height: 600},
+		ImageParam:  bimg.Options{Width: 800, Height: 600, Background: colorWhite},
 		TaskBackend: "Memory",
 	}
 	j, _ := json.Marshal(conf)
@@ -40,6 +42,7 @@ func TestCheckConfigDecoder(t *testing.T) {
 
 	if c.ImageParam.Width != 800 ||
 		c.ImageParam.Height != 600 ||
+		c.ImageParam.Background != colorWhite ||
 		c.TaskBackend != "Memory" {
 		t.Errorf("Config has been read incorrectly.")
 	}
