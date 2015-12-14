@@ -44,3 +44,17 @@ func TestExist(t *testing.T) {
 		t.Errorf("Image with the hash doesn't exist.")
 	}
 }
+
+// Save should check if image already exists
+func TestSaveTwice(t *testing.T) {
+	defer cleanUp()
+	hash := "someRandomString"
+	var image []byte
+	if _, err := backend.Save(image, hash); err != nil {
+		t.Errorf("Got error %s", err.Error())
+	}
+
+	if _, err := backend.Save(image, hash); err != nil {
+		t.Errorf("Got error %s", err.Error())
+	}
+}
