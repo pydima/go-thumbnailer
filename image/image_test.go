@@ -131,7 +131,7 @@ func TestCreateThumbnail(t *testing.T) {
 	}
 
 	b := readAndCheckFile("png.png", t)
-	res, err := createThumbnail(b, &options)
+	res, err := bimg.Resize(b, options)
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}
@@ -148,7 +148,7 @@ func TestConvertJpgToPng(t *testing.T) {
 		Type:       3,
 	}
 	b := readAndCheckFile("jpg.jpg", t)
-	res, err := createThumbnail(b, &options)
+	res, err := bimg.Resize(b, options)
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}

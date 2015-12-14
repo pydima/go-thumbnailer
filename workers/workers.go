@@ -48,14 +48,14 @@ func process(b tasks.Tasker) {
 			s <- i
 		}()
 
-		path, err := image.ProcessImage(<-s)
-		if err != nil {
-			log.Fatal("Sorry.")
-		}
+		// path, err := image.ProcessImage(<-s)
+		// if err != nil {
+		// 	log.Fatal("Sorry.")
+		// }
 
-		db_i.Path = path
+		// db_i.Path = path
 
-		models.Db.Create(&db_i)
+		// models.Db.Create(&db_i)
 	}
 	var i []image.Image
 	go utils.Notify(t.NotifyUrl, i)

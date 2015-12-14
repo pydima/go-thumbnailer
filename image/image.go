@@ -1,20 +1,14 @@
 package image
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"image"
 	"image/gif"
 	_ "image/jpeg"
 	"image/png"
-	"io"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/h2non/bimg"
 
 	"github.com/pydima/go-thumbnailer/config"
 )
@@ -95,34 +89,4 @@ func convertGifToPng(img []byte) ([]byte, error) {
 	}
 
 	return res.Bytes(), nil
-}
-
-func createThumbnail(img []byte, opts *bimg.Options) ([]byte, error) {
-	return bimg.Resize(img, *opts)
-}
-
-func ProcessImage(i io.ReadCloser) (path string, err error) {
-	options := bimg.Options{
-		Width:   100,
-		Height:  100,
-		Crop:    true,
-		Quality: 95,
-	}
-
-	path = "res.jpg"
-
-	f, _ := os.Create(path)
-	w := bufio.NewWriter(f)
-	input, _ := ioutil.ReadAll(i)
-
-	buf, err := bimg.Resize(input, options)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
-
-	w.Write(buf)
-	w.Flush()
-	fmt.Println("Done!")
-	return
 }
