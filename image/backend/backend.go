@@ -1,5 +1,5 @@
 package backend
 
 type ImageBackender interface {
-	Save(img []byte) (path string, err error)
+	Save(imgs map[string][]byte) (paths []string, err error)
 }

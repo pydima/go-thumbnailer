@@ -3,9 +3,13 @@ package backend
 import (
 	"crypto/sha1"
 	"encoding/base64"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+	"syscall"
+	"time"
 )
 
 type FSBackend struct {
@@ -13,7 +17,7 @@ type FSBackend struct {
 }
 
 func (fb FSBackend) generatePath(hash string) (path string) {
-	return filepath.Join(fb.BasePath, hash[:2], hash[2:4], hash[4:])
+	return filepath.Join(fb.BasePath, hash[:2], hash[2:4], hash[4:6], hash[6:])
 }
 
 func (fb FSBackend) exists(path string) bool {
@@ -23,53 +27,84 @@ func (fb FSBackend) exists(path string) bool {
 	return true
 }
 
-func (fb FSBackend) Save(img []byte, filename string) (string, error) {
+func (fb FSBackend) generateDest(imgs map[string][]byte, basePath string) []string {
+	res := make([]string, 0, len(imgs))
+	for k, _ := range imgs {
+		res = append(res, filepath.Join(basePath, k))
+	}
+	return res
+}
+
+func (fb FSBackend) Save(imgs map[string][]byte) ([]string, error) {
+	var (
+		found bool
+		img   []byte
+	)
+	for k, v := range imgs {
+		if strings.HasPrefix(k, "original") { // image might have different extensions e.g. 'jpg', 'png'
+			img = v
+			found = true
+			break
+		}
+	}
+	if !found {
+		return nil, fmt.Errorf("cannot find original image.")
+	}
+
 	s := sha1.Sum(img)
 	hash := base64.URLEncoding.EncodeToString(s[:])
 	dir := fb.generatePath(hash)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return "", err
+	if fb.exists(dir) {
+		return fb.generateDest(imgs, dir), nil
 	}
 
-	path := filepath.Join(dir, filename)
-	if fb.exists(path) {
-		return path, nil
-	}
-
-	f, err := ioutil.TempFile(dir, "tmp_")
+	baseTempDir := filepath.Join(fb.BasePath, "tmp")
+	tmpDir, err := ioutil.TempDir(baseTempDir, time.Now().Format(time.RFC3339)+"_")
 	if err != nil {
-		return "", err
+		pathErr, ok := err.(*os.PathError)
+		if !ok {
+			return nil, err
+		}
+		if pathErr.Err != syscall.ENOENT {
+			return nil, err
+		} else {
+			if err := os.MkdirAll(baseTempDir, 0755); err != nil {
+				return nil, err
+			}
+			tmpDir, err = ioutil.TempDir(baseTempDir, time.Now().Format(time.RFC3339)+"_")
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	defer func() {
-		name := f.Name()
-		if fb.exists(name) {
-			os.Remove(name)
+		if fb.exists(tmpDir) {
+			os.RemoveAll(tmpDir)
 		}
 	}()
 
-	if err := f.Chmod(0644); err != nil {
-		f.Close()
-		return "", err
+	for k, v := range imgs {
+		if err := ioutil.WriteFile(filepath.Join(tmpDir, k), v, 0644); err != nil {
+			return nil, err
+		}
 	}
 
-	if _, err := f.Write(img); err != nil {
-		f.Close()
-		return "", err
+	parentDir := filepath.Dir(dir)
+	err = os.MkdirAll(parentDir, 0755)
+	if err != nil {
+		return nil, err
 	}
 
-	if err := f.Sync(); err != nil {
-		f.Close()
-		return "", err
+	if err := os.Rename(tmpDir, dir); err != nil {
+		linkErr, ok := err.(*os.LinkError)
+		if !ok {
+			return nil, err
+		}
+		if linkErr.Err != syscall.ENOTEMPTY {
+			return nil, err
+		}
 	}
 
-	if err := f.Close(); err != nil {
-		return "", err
-	}
-
-	if err := os.Rename(f.Name(), path); err != nil {
-		return "", err
-	}
-
-	return path, nil
+	return fb.generateDest(imgs, dir), nil
 }
