@@ -42,7 +42,7 @@ func (e InvalidImage) Error() string {
 	return e.err
 }
 
-func checkExtension(n string) error {
+func CheckExtension(n string) error {
 	for _, ext := range config.Base.ValidExtensions {
 		if strings.HasSuffix(strings.ToLower(n), ext) {
 			return nil
@@ -51,7 +51,7 @@ func checkExtension(n string) error {
 	return InvalidImage{fmt.Sprintf("Extension %s is not supported.", filepath.Ext(n))}
 }
 
-func checkImageFormat(img []byte) ImageType {
+func ImageFormat(img []byte) ImageType {
 	if len(img) < 2 {
 		return UNKNOWN
 	}
@@ -68,7 +68,7 @@ func checkImageFormat(img []byte) ImageType {
 	}
 }
 
-func getImageDimensions(img []byte) (width, height int, err error) {
+func ImageDimensions(img []byte) (width, height int, err error) {
 	r := bytes.NewReader(img)
 	conf, _, err := image.DecodeConfig(r)
 	return conf.Width, conf.Height, err
