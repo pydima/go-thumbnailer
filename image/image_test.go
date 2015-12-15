@@ -156,3 +156,23 @@ func TestConvertJpgToPng(t *testing.T) {
 		t.Errorf("Invalid image format.")
 	}
 }
+
+func TestProcessImage(t *testing.T) {
+	options := bimg.Options{
+		Width:      100,
+		Height:     100,
+		Enlarge:    true,
+		Quality:    95,
+		Background: bimg.Color{255, 255, 255},
+		Type:       3,
+	}
+	b := readAndCheckFile("gif.gif", t)
+	res, err := ProcessImage(b, options)
+	if err != nil {
+		t.Errorf("Got error: %s", err)
+	}
+	if f := ImageFormat(res); f != PNG {
+		t.Errorf("Invalid image format.")
+	}
+	checkDimensions(res, 100, 100, t, false)
+}

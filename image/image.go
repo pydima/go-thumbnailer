@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/h2non/bimg"
+
 	"github.com/pydima/go-thumbnailer/config"
 )
 
@@ -89,4 +91,19 @@ func convertGifToPng(img []byte) ([]byte, error) {
 	}
 
 	return res.Bytes(), nil
+}
+
+func ProcessImage(img []byte, opts bimg.Options) (res []byte, err error) {
+	img_t := ImageFormat(img)
+	switch img_t {
+	case UNKNOWN:
+		return nil, fmt.Errorf("got unknown type")
+	case GIF:
+		img, err = convertGifToPng(img)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return bimg.Resize(img, opts)
 }
