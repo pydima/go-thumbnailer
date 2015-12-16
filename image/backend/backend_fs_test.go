@@ -18,7 +18,10 @@ func init() {
 	if err != nil {
 		log.Fatalln("Something went wrong. ", err)
 	}
-	backend = FSBackend{BasePath: p}
+	backend = FSBackend{
+		BasePath: p,
+		TmpDir:   filepath.Join(p, "tmp"),
+	}
 }
 
 func cleanUp() {
@@ -78,8 +81,7 @@ func TestGenerateDest(t *testing.T) {
 
 func TestCreateTmpDir(t *testing.T) {
 	defer cleanUp()
-	baseTempDir := filepath.Join(backend.BasePath, "tmp")
-	if backend.exists(baseTempDir) {
+	if backend.exists(backend.TmpDir) {
 		t.Errorf("Base temp directory already exists.")
 	}
 
@@ -182,8 +184,7 @@ func TestImageGC(t *testing.T) {
 		t.Errorf("Directory was deleted.")
 	}
 
-	baseTempDir := filepath.Join(backend.BasePath, "tmp")
-	tmpDir, err = ioutil.TempDir(baseTempDir, (time.Now().Add(-time.Hour*25)).Format(time.RFC3339)+"_")
+	tmpDir, err = ioutil.TempDir(backend.TmpDir, (time.Now().Add(-time.Hour*25)).Format(time.RFC3339)+"_")
 	if err != nil {
 		t.Errorf("Got error %s", err)
 	}

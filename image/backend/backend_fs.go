@@ -18,6 +18,7 @@ func imageGC() {
 
 type FSBackend struct {
 	BasePath string
+	TmpDir   string
 }
 
 func (fb FSBackend) generatePath(hash string) (path string) {
@@ -40,8 +41,7 @@ func (fb FSBackend) generateDest(imgs map[string][]byte, basePath string) []stri
 }
 
 func (fb FSBackend) createTmpDir() (tmpDir string, err error) {
-	baseTempDir := filepath.Join(fb.BasePath, "tmp")
-	tmpDir, err = ioutil.TempDir(baseTempDir, time.Now().Format(time.RFC3339)+"_")
+	tmpDir, err = ioutil.TempDir(fb.TmpDir, time.Now().Format(time.RFC3339)+"_")
 
 	if err != nil {
 		pathErr, ok := err.(*os.PathError)
@@ -53,11 +53,11 @@ func (fb FSBackend) createTmpDir() (tmpDir string, err error) {
 			return
 		} else {
 
-			if err = os.MkdirAll(baseTempDir, 0755); err != nil {
+			if err = os.MkdirAll(fb.TmpDir, 0755); err != nil {
 				return
 			}
 
-			tmpDir, err = ioutil.TempDir(baseTempDir, time.Now().Format(time.RFC3339)+"_")
+			tmpDir, err = ioutil.TempDir(fb.TmpDir, time.Now().Format(time.RFC3339)+"_")
 			if err != nil {
 				return
 			}
