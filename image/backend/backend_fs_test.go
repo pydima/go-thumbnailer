@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 var backend FSBackend
@@ -78,7 +79,7 @@ func TestGenerateDest(t *testing.T) {
 func TestCreateTmpDir(t *testing.T) {
 	defer cleanUp()
 	baseTempDir := filepath.Join(backend.BasePath, "tmp")
-	if _, err := os.Stat(baseTempDir); !os.IsNotExist(err) {
+	if backend.exists(baseTempDir) {
 		t.Errorf("Base temp directory already exists.")
 	}
 
@@ -166,5 +167,28 @@ func TestMoveFiles(t *testing.T) {
 	err = backend.moveFiles(tmpDir, dst)
 	if err == nil {
 		t.Errorf("Should get an error if dst is not empty.")
+	}
+}
+
+func TestImageGC(t *testing.T) {
+	defer cleanUp()
+
+	tmpDir, err := backend.createTmpDir()
+	if err != nil {
+		t.Errorf("Got error %s", err)
+	}
+	imageGC()
+	if !backend.exists(tmpDir) {
+		t.Errorf("Directory was deleted.")
+	}
+
+	baseTempDir := filepath.Join(backend.BasePath, "tmp")
+	tmpDir, err = ioutil.TempDir(baseTempDir, (time.Now().Add(-time.Hour*25)).Format(time.RFC3339)+"_")
+	if err != nil {
+		t.Errorf("Got error %s", err)
+	}
+	imageGC()
+	if backend.exists(tmpDir) {
+		t.Errorf("Directory exists, should have deleted it.")
 	}
 }

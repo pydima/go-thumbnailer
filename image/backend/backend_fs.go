@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+func imageGC() {
+
+}
+
 type FSBackend struct {
 	BasePath string
 }
