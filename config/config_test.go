@@ -10,7 +10,7 @@ import (
 	"github.com/h2non/bimg"
 )
 
-var colorWhite = bimg.Color{255, 255, 255}
+var colorWhite = bimg.Color{R: 255, G: 255, B: 255}
 
 func createTempConfig(name string) {
 	conf := Config{

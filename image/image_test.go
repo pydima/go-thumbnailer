@@ -127,7 +127,7 @@ func TestCreateThumbnail(t *testing.T) {
 		Height:     100,
 		Enlarge:    true,
 		Quality:    95,
-		Background: bimg.Color{255, 255, 255},
+		Background: bimg.Color{R: 255, G: 255, B: 255},
 	}
 
 	b := readAndCheckFile("png.png", t)
@@ -144,7 +144,7 @@ func TestConvertJpgToPng(t *testing.T) {
 		Height:     100,
 		Enlarge:    true,
 		Quality:    95,
-		Background: bimg.Color{255, 255, 255},
+		Background: bimg.Color{R: 255, G: 255, B: 255},
 		Type:       3,
 	}
 	b := readAndCheckFile("jpg.jpg", t)
@@ -163,7 +163,7 @@ func TestProcessImage(t *testing.T) {
 		Height:     100,
 		Enlarge:    true,
 		Quality:    95,
-		Background: bimg.Color{255, 255, 255},
+		Background: bimg.Color{R: 255, G: 255, B: 255},
 		Type:       3,
 	}
 	b := readAndCheckFile("gif.gif", t)

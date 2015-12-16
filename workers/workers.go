@@ -43,10 +43,10 @@ func process(b tasks.Tasker) {
 		}
 
 		s := make(chan io.ReadCloser, 1)
-		go func() {
+		go func(is tasks.ImageSource) {
 			i := get_image(is)
 			s <- i
-		}()
+		}(is)
 
 		// path, err := image.ProcessImage(<-s)
 		// if err != nil {
