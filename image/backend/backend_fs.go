@@ -12,8 +12,30 @@ import (
 	"time"
 )
 
-func imageGC() {
+func imageGC(tmpDir string) error {
+	dirs, err := ioutil.ReadDir(tmpDir)
+	if err != nil {
+		return err
+	}
 
+	for _, d := range dirs {
+		name := d.Name()
+		splitName := strings.Split(name, "_")
+		if len(splitName) < 2 {
+			continue
+		}
+		t, err := time.Parse(time.RFC3339, splitName[0])
+		if err != nil {
+			continue
+		}
+		if time.Since(t).Hours() > 24 {
+			if err = os.RemoveAll(filepath.Join(tmpDir, name)); err != nil { // TODO: add logging.
+				continue
+			}
+		}
+	}
+
+	return nil
 }
 
 type FSBackend struct {

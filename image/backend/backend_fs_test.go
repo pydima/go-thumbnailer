@@ -179,7 +179,9 @@ func TestImageGC(t *testing.T) {
 	if err != nil {
 		t.Errorf("Got error %s", err)
 	}
-	imageGC()
+	if err = imageGC(backend.TmpDir); err != nil {
+		t.Errorf("Got error %s", err)
+	}
 	if !backend.exists(tmpDir) {
 		t.Errorf("Directory was deleted.")
 	}
@@ -188,8 +190,22 @@ func TestImageGC(t *testing.T) {
 	if err != nil {
 		t.Errorf("Got error %s", err)
 	}
-	imageGC()
+	if err = imageGC(backend.TmpDir); err != nil {
+		t.Errorf("Got error %s", err)
+	}
 	if backend.exists(tmpDir) {
 		t.Errorf("Directory exists, should have deleted it.")
+	}
+
+	// shouldn't delete directory with wrong format
+	tmpDir, err = ioutil.TempDir(backend.TmpDir, "invalidFormat"+"_")
+	if err != nil {
+		t.Errorf("Got error %s", err)
+	}
+	if err = imageGC(backend.TmpDir); err != nil {
+		t.Errorf("Got error %s", err)
+	}
+	if !backend.exists(tmpDir) {
+		t.Errorf("Directory was deleted.")
 	}
 }
