@@ -32,7 +32,7 @@ func readAndCheckFile(name string, t *testing.T) []byte {
 	bp := "/go/src/github.com/pydima/go-thumbnailer/testdata/"
 	b, err := ioutil.ReadFile(filepath.Join(bp, name))
 	if err != nil {
-		t.Errorf("Cannot read the test file")
+		t.Fatalf("Cannot read the test file")
 	}
 	return b
 }
@@ -89,13 +89,13 @@ func checkDimensions(b []byte, width, height int, t *testing.T, exact bool) {
 
 func TestGetImageDimensions(t *testing.T) {
 	b := readAndCheckFile("jpg.jpg", t)
-	checkDimensions(b, 1431, 901, t, true)
+	checkDimensions(b, 1634, 2224, t, true)
 
 	b = readAndCheckFile("png.png", t)
 	checkDimensions(b, 1634, 2224, t, true)
 
 	b = readAndCheckFile("gif.gif", t)
-	checkDimensions(b, 450, 159, t, true)
+	checkDimensions(b, 1634, 2224, t, true)
 
 	b = readAndCheckFile("bmp.bmp", t)
 	_, _, err := ImageDimensions(b)

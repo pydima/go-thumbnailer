@@ -198,7 +198,7 @@ func TestImageGC(t *testing.T) {
 	}
 
 	// shouldn't delete directory with wrong format
-	tmpDir, err = ioutil.TempDir(backend.TmpDir, "invalidFormat"+"_")
+	tmpDir, err = ioutil.TempDir(backend.TmpDir, "invalidFormat")
 	if err != nil {
 		t.Errorf("Got error %s", err)
 	}
