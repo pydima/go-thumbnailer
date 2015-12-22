@@ -14,6 +14,7 @@ type Config struct {
 	Host            string
 	Port            int
 	ValidExtensions []string
+	Thumbnails      map[string][2]int
 }
 
 var Base Config

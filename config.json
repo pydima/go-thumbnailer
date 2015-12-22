@@ -10,5 +10,12 @@
 	"TaskBackend": "Memory",
 	"Host": "localhost",
 	"Port": 8080,
-	"ValidExtensions": ["jpg", "jpeg", "png"]
+	"ValidExtensions": ["jpg", "jpeg", "png"],
+	"Thumbnails": {
+	    "254x254": [254, 254],
+	    "138x138": [138, 138],
+	    "126x126": [126, 126],
+	    "80x80"  : [80, 80],
+	    "50x50"  : [50, 50]
+	}
 }
