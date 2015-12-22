@@ -200,8 +200,14 @@ func TestCreateThumbnails(t *testing.T) {
 		t.Errorf("Got not enough thumbnails.")
 	}
 
-	for _, img := range res {
-		if f := ImageFormat(img); f != PNG {
+	for k, img := range res {
+		var it ImageType
+		if strings.HasPrefix(k, "original") {
+			it = PNG
+		} else {
+			it = JPG
+		}
+		if f := ImageFormat(img); f != it {
 			t.Errorf("Invalid image format.")
 		}
 	}

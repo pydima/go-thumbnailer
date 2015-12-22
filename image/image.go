@@ -143,6 +143,7 @@ func CreateThumbnails(original []byte) (map[string][]byte, error) {
 	for k, v := range config.Base.Thumbnails {
 		opts.Width = v[0]
 		opts.Height = v[1]
+		opts.Type = 1
 		img, err := ProcessImage(origThumbnail, opts)
 		if err != nil {
 			return nil, err
