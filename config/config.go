@@ -11,6 +11,9 @@ import (
 type Config struct {
 	ImageParam      bimg.Options
 	TaskBackend     string
+	ImageBackend    string
+	TmpDir          string
+	MediaRoot       string
 	Host            string
 	Port            int
 	ValidExtensions []string

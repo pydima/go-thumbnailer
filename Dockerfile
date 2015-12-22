@@ -14,4 +14,5 @@ ADD . /go/src/github.com/pydima/go-thumbnailer
 WORKDIR /go/src/github.com/pydima/go-thumbnailer
 RUN go get
 RUN mkdir -p /etc/go_thumbnailer && cp /go/src/github.com/pydima/go-thumbnailer/config.json /etc/go_thumbnailer/config.json
+EXPOSE 8080
 ENTRYPOINT /bin/bash

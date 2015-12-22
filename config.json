@@ -8,6 +8,9 @@
 		"Type": 3
 	},
 	"TaskBackend": "Memory",
+	"ImageBackend": "FS",
+	"TmpDir": "/tmp",
+	"MediaRoot" "/tmp/images"
 	"Host": "localhost",
 	"Port": 8080,
 	"ValidExtensions": ["jpg", "jpeg", "png"],

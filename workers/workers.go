@@ -2,10 +2,12 @@ package workers
 
 import (
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 
 	"github.com/pydima/go-thumbnailer/image"
+	"github.com/pydima/go-thumbnailer/image/backend"
 	"github.com/pydima/go-thumbnailer/models"
 	"github.com/pydima/go-thumbnailer/tasks"
 	"github.com/pydima/go-thumbnailer/utils"
@@ -48,14 +50,20 @@ func process(b tasks.Tasker) {
 			s <- i
 		}(is)
 
-		// path, err := image.ProcessImage(<-s)
-		// if err != nil {
-		// 	log.Fatal("Sorry.")
-		// }
+		res, _ := ioutil.ReadAll(<-s)
+		thumbs, err := image.CreateThumbnails(res)
+		if err != nil {
+			log.Fatal("Sorry.")
+		}
 
-		// db_i.Path = path
+		paths, err := backend.ImageBackend.Save(thumbs)
+		if err != nil {
+			log.Fatal("Shit happens.")
+		}
 
-		// models.Db.Create(&db_i)
+		db_i.Path = paths[0]
+
+		models.Db.Create(&db_i)
 	}
 	var i []image.Image
 	go utils.Notify(t.NotifyUrl, i)
