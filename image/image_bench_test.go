@@ -51,3 +51,15 @@ func BenchmarkProcessImageJpg(b *testing.B) {
 		ProcessImage(img, options)
 	}
 }
+
+func BenchmarkCreatheThumbnailImagePng(b *testing.B) {
+	img, err := ioutil.ReadFile("/go/src/github.com/pydima/go-thumbnailer/testdata/png.png")
+	if err != nil {
+		b.Fatalf("Cannot read the test file")
+	}
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		CreateThumbnails(img)
+	}
+}

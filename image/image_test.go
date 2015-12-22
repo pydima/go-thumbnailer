@@ -3,6 +3,7 @@ package image
 import (
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/h2non/bimg"
@@ -35,6 +36,17 @@ func readAndCheckFile(name string, t *testing.T) []byte {
 		t.Fatalf("Cannot read the test file")
 	}
 	return b
+}
+
+func TestConstructName(t *testing.T) {
+	images := []string{"jpg.jpg", "png.png", "gif.gif"}
+	for _, i := range images {
+		b := readAndCheckFile(i, t)
+		want := i
+		if res := constructName(strings.Split(i, ".")[0], b); res != want {
+			t.Errorf("constructName(); want - %s, get - %s", want, res)
+		}
+	}
 }
 
 func TestImageFormat(t *testing.T) {
@@ -175,4 +187,22 @@ func TestProcessImage(t *testing.T) {
 		t.Errorf("Invalid image format.")
 	}
 	checkDimensions(res, 100, 100, t, false)
+}
+
+func TestCreateThumbnails(t *testing.T) {
+	b := readAndCheckFile("png.png", t)
+	res, err := CreateThumbnails(b)
+	if err != nil {
+		t.Errorf("Got error: %s", err)
+	}
+
+	if len(res) < 2 {
+		t.Errorf("Got not enough thumbnails.")
+	}
+
+	for _, img := range res {
+		if f := ImageFormat(img); f != PNG {
+			t.Errorf("Invalid image format.")
+		}
+	}
 }

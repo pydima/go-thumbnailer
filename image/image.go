@@ -44,6 +44,19 @@ func (e InvalidImage) Error() string {
 	return e.err
 }
 
+func constructName(prefix string, img []byte) string {
+	switch ImageFormat(img) {
+	case GIF:
+		return prefix + ".gif"
+	case JPG:
+		return prefix + ".jpg"
+	case PNG:
+		return prefix + ".png"
+	default:
+		return ""
+	}
+}
+
 func CheckExtension(n string) error {
 	for _, ext := range config.Base.ValidExtensions {
 		if strings.HasSuffix(strings.ToLower(n), ext) {
@@ -105,5 +118,37 @@ func ProcessImage(img []byte, opts bimg.Options) (res []byte, err error) {
 		}
 	}
 
+	meta, err := bimg.Metadata(img)
+	if err != nil {
+		return nil, err
+	}
+
+	if !meta.Alpha {
+		opts.Background = bimg.Color{R: 0, G: 0, B: 0}
+	}
+
 	return bimg.Resize(img, opts)
+}
+
+func CreateThumbnails(original []byte) (map[string][]byte, error) {
+	opts := bimg.Options(config.Base.ImageParam)
+
+	origThumbnail, err := ProcessImage(original, opts)
+	if err != nil {
+		return nil, err
+	}
+	imgs := make(map[string][]byte)
+	imgs[constructName("original", origThumbnail)] = origThumbnail
+
+	for k, v := range config.Base.Thumbnails {
+		opts.Width = v[0]
+		opts.Height = v[1]
+		img, err := ProcessImage(origThumbnail, opts)
+		if err != nil {
+			return nil, err
+		}
+		imgs[constructName(k, img)] = img
+	}
+
+	return imgs, nil
 }
