@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/pydima/go-thumbnailer/image"
 )
@@ -41,4 +43,15 @@ func Notify(url string, images []image.Image) (err error) {
 	}
 	http.Post(url, "application/json", bytes.NewReader(data))
 	return
+}
+
+func HandleSigTerm() chan struct{} {
+	done := make(chan struct{})
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGINT)
+	go func() {
+		<-sigs
+		close(done)
+	}()
+	return done
 }
