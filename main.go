@@ -19,7 +19,7 @@ func main() {
 
 	defer tasks.Backend.Close()
 
-	workers.Run(done)
+	go workers.Run(done)
 
 	host := config.Base.Host
 	port := config.Base.Port

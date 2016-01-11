@@ -1,7 +1,7 @@
 package workers
 
 import (
-	"io"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,75 +13,87 @@ import (
 	"github.com/pydima/go-thumbnailer/utils"
 )
 
-var N = 10
-
 func Run(done <-chan struct{}) {
-	for i := 0; i <= N; i++ {
-		go process(tasks.Backend, done)
-	}
-}
+	tasksChan := make(chan *tasks.Task)
+	go func() {
+		for {
+			t := tasks.Backend.Get()
+			tasksChan <- t
+		}
+	}()
 
-func get_image(is tasks.ImageSource) (i io.ReadCloser, err error) {
-	if is.Path[:4] == "http" {
-		i, err = utils.DownloadImage(is.Path)
-	} else {
-		i, err = os.Open(is.Path)
-	}
-	return
-}
-
-func process(b tasks.Tasker, done <-chan struct{}) {
 	for {
 		select {
 		case <-done:
 			log.Println("Got signal, stop processing.")
-		default:
-			break
+			return
+		case t := <-tasksChan:
+			fmt.Println("Create task.")
+			go process(t)
 		}
-
-		t := b.Get()
-		for _, is := range t.Images {
-
-			db_i := models.Image{
-				OriginalPath: is.Path,
-				Identifier:   is.Identifier,
-			}
-
-			if db_i.Exist() {
-				log.Println("This image is already exist.")
-				break
-			}
-
-			s := make(chan io.ReadCloser, 1)
-			go func(is tasks.ImageSource) {
-				i, err := get_image(is)
-				if err != nil {
-					close(s)
-				}
-				s <- i
-			}(is)
-
-			img, ok := <-s
-			if !ok {
-				continue
-			}
-
-			res, _ := ioutil.ReadAll(img)
-			thumbs, err := image.CreateThumbnails(res)
-			if err != nil {
-				log.Fatal("Sorry.")
-			}
-
-			paths, err := backend.ImageBackend.Save(thumbs)
-			if err != nil {
-				log.Fatal("Shit happens.")
-			}
-
-			db_i.Path = paths[0]
-
-			models.Db.Create(&db_i)
-		}
-		var i []image.Image
-		go utils.Notify(t.NotifyUrl, i)
 	}
+}
+
+func get_image(is tasks.ImageSource) ([]byte, error) {
+	var data []byte
+
+	if is.Path[:4] == "http" {
+		return utils.DownloadImage(is.Path)
+
+	} else {
+		img, err := os.Open(is.Path)
+		if err != nil {
+			return data, err
+		}
+		defer img.Close()
+		return ioutil.ReadAll(img)
+	}
+}
+
+func process(t *tasks.Task) {
+	for _, is := range t.Images {
+		db_i := models.Image{
+			OriginalPath: is.Path,
+			Identifier:   is.Identifier,
+		}
+
+		if db_i.Exist() {
+			log.Println("This image is already exist.")
+			return
+		}
+
+		s := make(chan []byte, 1)
+		go func(is tasks.ImageSource) {
+			i, err := get_image(is)
+			if err != nil {
+				close(s)
+				return
+			}
+			s <- i
+		}(is)
+
+		res, ok := <-s
+		if !ok {
+			continue
+		}
+
+		thumbs, err := image.CreateThumbnails(res)
+		if err != nil {
+			log.Printf("Sorry. %s", err)
+			continue
+		}
+
+		paths, err := backend.ImageBackend.Save(thumbs)
+		if err != nil {
+			log.Printf("Shit happens.")
+			continue
+		}
+
+		db_i.Path = paths[0]
+
+		models.Db.Create(&db_i)
+	}
+	// var i []image.Image
+	// go utils.Notify(t.NotifyUrl, i)
+
 }

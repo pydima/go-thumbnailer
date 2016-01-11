@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/pydima/go-thumbnailer/image"
 )
@@ -31,9 +32,17 @@ func UUID() string {
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
-func DownloadImage(u string) (io.ReadCloser, error) {
+func DownloadImage(u string) ([]byte, error) {
+	var data []byte
 	resp, err := http.Get(u)
-	return resp.Body, err
+	if err != nil {
+		return data, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return data, fmt.Errorf("error status code %d.", resp.StatusCode)
+	}
+	return ioutil.ReadAll(resp.Body)
 }
 
 func Notify(url string, images []image.Image) (err error) {
@@ -52,6 +61,7 @@ func HandleSigTerm() chan struct{} {
 	go func() {
 		<-sigs
 		close(done)
+		os.Exit(0)
 	}()
 	return done
 }
