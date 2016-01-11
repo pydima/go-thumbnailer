@@ -61,6 +61,7 @@ func HandleSigTerm() chan struct{} {
 	go func() {
 		<-sigs
 		close(done)
+		time.Sleep(time.Second * 3)
 		os.Exit(0)
 	}()
 	return done
