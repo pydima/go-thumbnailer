@@ -51,6 +51,8 @@ func get_image(is tasks.ImageSource) ([]byte, error) {
 }
 
 func process(t *tasks.Task) {
+	defer tasks.Backend.Complete(t)
+
 	for _, is := range t.Images {
 		db_i := models.Image{
 			OriginalPath: is.Path,

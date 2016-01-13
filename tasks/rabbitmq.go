@@ -9,9 +9,11 @@ import (
 )
 
 type RabbitMQBackend struct {
-	conn  *amqp.Connection
-	tasks *amqp.Channel
-	queue *amqp.Queue
+	conn       *amqp.Connection
+	channel    *amqp.Channel
+	queue      *amqp.Queue
+	msgs       <-chan amqp.Delivery
+	deliveries map[string]*amqp.Delivery
 }
 
 func failOnError(err error, msg string) {
@@ -24,11 +26,9 @@ func failOnError(err error, msg string) {
 func get_connection() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
 		"images", // name
@@ -43,28 +43,33 @@ func get_connection() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
 }
 
 func (mb *RabbitMQBackend) Get() *Task {
-	msgs, err := mb.tasks.Consume(
-		mb.queue.Name, // queue
-		"",            // consumer
-		false,         // auto-ack
-		false,         // exclusive
-		false,         // no-local
-		false,         // no-wait
-		nil,           // args
-	)
-	failOnError(err, "Failed to register a consumer")
+	if mb.msgs == nil {
+		msgs, err := mb.channel.Consume(
+			mb.queue.Name, // queue
+			"",            // consumer
+			false,         // auto-ack
+			false,         // exclusive
+			false,         // no-local
+			false,         // no-wait
+			nil,           // args
+		)
+		failOnError(err, "Failed to register a consumer")
+		mb.msgs = msgs
+	}
 
 	var t *Task
-	msg := <-msgs
-	err = json.Unmarshal(msg.Body, &t)
+	msg := <-mb.msgs
+	err := json.Unmarshal(msg.Body, &t)
 	failOnError(err, "Failed to unmarshal data")
+
+	mb.deliveries[t.TaskID] = &msg
 	return t
 }
 
 func (mb *RabbitMQBackend) Put(t *Task) {
 	data, err := json.Marshal(*t)
 	failOnError(err, "cannot marshal data")
-	err = mb.tasks.Publish(
+	err = mb.channel.Publish(
 		"",            // exchange
 		mb.queue.Name, // routing key
 		false,         // mandatory
@@ -78,6 +83,15 @@ func (mb *RabbitMQBackend) Put(t *Task) {
 }
 
 func (mb *RabbitMQBackend) Close() {
-	mb.tasks.Close()
+	mb.channel.Close()
 	mb.conn.Close()
+}
+
+func (mb *RabbitMQBackend) Complete(t *Task) {
+	d, ok := mb.deliveries[t.TaskID]
+	if !ok {
+		return
+	}
+	delete(mb.deliveries, t.TaskID)
+	d.Ack(false)
 }

@@ -15,3 +15,5 @@ func (mb *MemoryBackend) Put(t *Task) {
 }
 
 func (mb *MemoryBackend) Close() {}
+
+func (mb *MemoryBackend) Complete(t *Task) {}

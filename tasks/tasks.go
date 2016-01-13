@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/streadway/amqp"
+
 	"github.com/pydima/go-thumbnailer/config"
 )
 
@@ -33,6 +35,7 @@ type Tasker interface {
 	Get() *Task
 	Put(*Task)
 	Close()
+	Complete(*Task)
 }
 
 func NewBackend(bType string) (t Tasker, err error) {
@@ -41,7 +44,7 @@ func NewBackend(bType string) (t Tasker, err error) {
 		t = &MemoryBackend{make(chan *Task, 100)}
 	case "RabbitMQ":
 		conn, ch, q := get_connection()
-		t = &RabbitMQBackend{conn, ch, q}
+		t = &RabbitMQBackend{conn: conn, channel: ch, queue: q, deliveries: make(map[string]*amqp.Delivery)}
 	default:
 		err = errors.New("Unknown backend.")
 	}

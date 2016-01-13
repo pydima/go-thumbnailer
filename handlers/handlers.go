@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/pydima/go-thumbnailer/tasks"
-	"github.com/pydima/go-thumbnailer/utils"
 )
 
 func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
