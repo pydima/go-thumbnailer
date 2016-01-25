@@ -15,18 +15,19 @@ func init() {
 }
 
 func TestPutGetRabbitMQ(t *testing.T) {
-	task := &Task{TaskID: "test_task"}
+	task := New()
 
 	go RabbitBackend.Put(task)
 
 	task2 := RabbitBackend.Get()
+
 	if task.TaskID != task2.TaskID {
-		t.Error("Tasks are not the same.")
+		t.Errorf("Tasks are not the same. (%s -> %s)", task.TaskID, task2.TaskID)
 	}
 }
 
 func TestRabbitAckLate(t *testing.T) {
-	task := &Task{TaskID: "test_task"}
+	task := New()
 
 	go RabbitBackend.Put(task)
 	task2 := RabbitBackend.Get()

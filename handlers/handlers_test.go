@@ -12,15 +12,12 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	var (
-		image_source []tasks.ImageSource
-		task         tasks.Task
-	)
+	var image_source []tasks.ImageSource
+	task := tasks.New()
 
 	image_source = append(image_source, tasks.ImageSource{Path: "http://random_path_to_image.jpg", Identifier: ""})
 	task.Images = image_source
 	task.NotifyUrl = "http://localhost:8000/"
-	task.TaskID = "Random ID"
 
 	data, err := json.Marshal(task)
 	if err != nil {
@@ -37,7 +34,7 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	task2 := tasks.Backend.Get()
-	if task.TaskID != task2.TaskID {
-		t.Errorf("Tasks ID's are not the same.")
+	if task2.TaskID == "" {
+		t.Errorf("Tasks ID is empty.")
 	}
 }

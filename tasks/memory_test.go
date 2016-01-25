@@ -5,7 +5,7 @@ import (
 )
 
 func TestPutGetMemory(t *testing.T) {
-	task := &Task{TaskID: "test_task"}
+	task := New()
 
 	b, err := NewBackend("Memory")
 	if err != nil {

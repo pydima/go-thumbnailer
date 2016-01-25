@@ -57,9 +57,9 @@ func (mb *RabbitMQBackend) Get() *Task {
 		mb.msgs = msgs
 	}
 
-	var t *Task
+	t := New()
 	msg := <-mb.msgs
-	err := json.Unmarshal(msg.Body, &t)
+	err := json.Unmarshal(msg.Body, t)
 	failOnError(err, "Failed to unmarshal data")
 
 	mb.deliveries[t.TaskID] = &msg
