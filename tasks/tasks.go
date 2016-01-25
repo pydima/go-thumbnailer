@@ -7,6 +7,7 @@ import (
 	"github.com/streadway/amqp"
 
 	"github.com/pydima/go-thumbnailer/config"
+	"github.com/pydima/go-thumbnailer/utils"
 )
 
 var Backend Tasker
@@ -17,6 +18,13 @@ func init() {
 	Backend, err = NewBackend(bt)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func New() *Task {
+	return &Task{
+		Images: make([]ImageSource, 3),
+		TaskID: utils.UUID(),
 	}
 }
 
