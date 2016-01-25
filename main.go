@@ -13,13 +13,12 @@ import (
 )
 
 func main() {
-	done := utils.HandleSigTerm()
-
+	utils.HandleSigTerm()
 	http.HandleFunc("/thumbnail", handlers.CreateThumbnail)
 
 	defer tasks.Backend.Close()
 
-	go workers.Run(done)
+	go workers.Run()
 
 	host := config.Base.Host
 	port := config.Base.Port

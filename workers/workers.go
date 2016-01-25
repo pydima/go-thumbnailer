@@ -13,7 +13,7 @@ import (
 	"github.com/pydima/go-thumbnailer/utils"
 )
 
-func Run(done <-chan struct{}) {
+func Run() {
 	tasksChan := make(chan *tasks.Task)
 	go func() {
 		for {
@@ -24,7 +24,7 @@ func Run(done <-chan struct{}) {
 
 	for {
 		select {
-		case <-done:
+		case <-utils.STOP:
 			log.Println("Got signal, stop processing.")
 			return
 		case t := <-tasksChan:

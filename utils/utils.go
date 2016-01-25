@@ -16,6 +16,7 @@ import (
 )
 
 var Random *os.File
+var STOP chan struct{}
 
 func init() {
 	f, err := os.Open("/dev/urandom")
@@ -23,6 +24,7 @@ func init() {
 		log.Fatal(err)
 	}
 	Random = f
+	STOP = make(chan struct{})
 }
 
 func UUID() string {
@@ -54,15 +56,13 @@ func Notify(url string, images []image.Image) (err error) {
 	return
 }
 
-func HandleSigTerm() chan struct{} {
-	done := make(chan struct{})
+func HandleSigTerm() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGINT)
 	go func() {
 		<-sigs
-		close(done)
+		close(STOP)
 		time.Sleep(time.Second * 3)
 		os.Exit(0)
 	}()
-	return done
 }

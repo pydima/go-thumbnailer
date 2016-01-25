@@ -8,9 +8,9 @@ import (
 )
 
 func TestHandleSigTerm(t *testing.T) {
-	done := HandleSigTerm()
+	HandleSigTerm()
 	select {
-	case <-done:
+	case <-STOP:
 		t.Errorf("Got signal, didn't send it.")
 	default:
 		break
@@ -19,7 +19,7 @@ func TestHandleSigTerm(t *testing.T) {
 	syscall.Kill(os.Getpid(), syscall.SIGTERM)
 
 	select {
-	case <-done:
+	case <-STOP:
 		break
 	case <-time.After(time.Second * 1):
 		t.Errorf("Didn't get a signal.")
