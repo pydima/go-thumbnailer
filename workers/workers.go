@@ -73,6 +73,7 @@ func process(t *tasks.Task) {
 		go func(is tasks.ImageSource) {
 			i, err := getImage(is)
 			if err != nil {
+				log.Println(err)
 				close(s)
 				return
 			}
