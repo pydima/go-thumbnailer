@@ -37,4 +37,5 @@ func TestCreateUser(t *testing.T) {
 	if task2.TaskID == "" {
 		t.Errorf("Tasks ID is empty.")
 	}
+	tasks.Backend.Complete(task2)
 }

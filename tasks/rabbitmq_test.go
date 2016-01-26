@@ -12,12 +12,12 @@ var (
 )
 
 func init() {
-	conn, ch, q := connection(queue)
-	RabbitBackend = &RabbitMQBackend{conn: conn, channel: ch, queue: q, deliveries: make(map[string]*amqp.Delivery)}
+	conn, pubCh, subCh := connection(queue)
+	RabbitBackend = &RabbitMQBackend{conn: conn, pubChannel: pubCh, subChannel: subCh, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
 }
 
 func TestPutGetRabbitMQ(t *testing.T) {
-	defer RabbitBackend.channel.QueuePurge(queue, true)
+	defer RabbitBackend.pubChannel.QueuePurge(queue, true)
 
 	task := New()
 
@@ -33,7 +33,7 @@ func TestPutGetRabbitMQ(t *testing.T) {
 }
 
 func TestRabbitAckLate(t *testing.T) {
-	defer RabbitBackend.channel.QueuePurge(queue, true)
+	defer RabbitBackend.pubChannel.QueuePurge(queue, true)
 
 	task := New()
 
