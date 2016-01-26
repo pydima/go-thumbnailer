@@ -51,7 +51,7 @@ func NewBackend(bType string) (t Tasker, err error) {
 	case "Memory":
 		t = &MemoryBackend{make(chan *Task, 100)}
 	case "RabbitMQ":
-		conn, ch, q := get_connection()
+		conn, ch, q := connection("images")
 		t = &RabbitMQBackend{conn: conn, channel: ch, queue: q, deliveries: make(map[string]*amqp.Delivery)}
 	default:
 		err = errors.New("Unknown backend.")

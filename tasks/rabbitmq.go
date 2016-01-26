@@ -23,7 +23,7 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func get_connection() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
+func connection(name string) (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 
@@ -31,12 +31,12 @@ func get_connection() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
 	failOnError(err, "Failed to open a channel")
 
 	q, err := ch.QueueDeclare(
-		"images", // name
-		true,     // durable
-		false,    // delete when unused
-		false,    // exclusive
-		false,    // no-wait
-		nil,      // arguments
+		name,  // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 	return conn, ch, &q
