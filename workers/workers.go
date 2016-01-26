@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/pydima/go-thumbnailer/image"
 	"github.com/pydima/go-thumbnailer/image/backend"
@@ -34,10 +35,14 @@ func Run() {
 	}
 }
 
-func get_image(is tasks.ImageSource) ([]byte, error) {
+func getImage(is tasks.ImageSource) ([]byte, error) {
 	var data []byte
 
-	if is.Path[:4] == "http" {
+	if len(is.Path) < 4 {
+		return data, fmt.Errorf("image path is empty")
+	}
+
+	if strings.HasPrefix(is.Path, "http") {
 		return utils.DownloadImage(is.Path)
 
 	} else {
@@ -66,7 +71,7 @@ func process(t *tasks.Task) {
 
 		s := make(chan []byte, 1)
 		go func(is tasks.ImageSource) {
-			i, err := get_image(is)
+			i, err := getImage(is)
 			if err != nil {
 				close(s)
 				return
