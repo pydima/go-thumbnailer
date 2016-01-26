@@ -75,8 +75,9 @@ func (mb *RabbitMQBackend) Put(t *Task) {
 		false,         // mandatory
 		false,         // immediate
 		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        data,
+			ContentType:  "application/json",
+			Body:         data,
+			DeliveryMode: amqp.Persistent,
 		})
 	failOnError(err, "Failed to publish a message")
 	return
