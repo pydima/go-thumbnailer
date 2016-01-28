@@ -6,7 +6,7 @@ import (
 	"github.com/pydima/go-thumbnailer/tasks"
 )
 
-func TestDownloadImage(t *testing.T) {
+func TestGetImage(t *testing.T) {
 	is := tasks.ImageSource{Path: ""}
 	_, err := getImage(is)
 	if err == nil {
