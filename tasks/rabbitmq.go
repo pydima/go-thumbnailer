@@ -3,6 +3,7 @@ package tasks
 import (
 	"encoding/json"
 	"log"
+	"sync"
 
 	"github.com/streadway/amqp"
 )
@@ -12,6 +13,7 @@ type RabbitMQBackend struct {
 	pubChannel *amqp.Channel
 	subChannel *amqp.Channel
 	queue      string
+	once       sync.Once
 	msgs       <-chan amqp.Delivery
 	deliveries map[string]*amqp.Delivery
 }
@@ -33,6 +35,12 @@ func connection(name string) (conn *amqp.Connection, pubCh, subCh *amqp.Channel)
 	subCh, err = conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
+	err = subCh.Qos(1, 0, false)
+	failOnError(err, "Failed to set Qos")
+
+	err = pubCh.Qos(1, 0, false)
+	failOnError(err, "Failed to set Qos")
+
 	_, err = pubCh.QueueDeclare(
 		name,  // name
 		true,  // durable
@@ -46,19 +54,20 @@ func connection(name string) (conn *amqp.Connection, pubCh, subCh *amqp.Channel)
 }
 
 func (mb *RabbitMQBackend) Get() *Task {
-	if mb.msgs == nil {
-		msgs, err := mb.subChannel.Consume(
-			mb.queue, // queue
-			"",       // consumer
-			false,    // auto-ack
-			false,    // exclusive
-			false,    // no-local
-			false,    // no-wait
-			nil,      // args
-		)
-		failOnError(err, "Failed to register a consumer")
-		mb.msgs = msgs
-	}
+	mb.once.Do(
+		func() {
+			msgs, err := mb.subChannel.Consume(
+				mb.queue, // queue
+				"",       // consumer
+				false,    // auto-ack
+				false,    // exclusive
+				false,    // no-local
+				false,    // no-wait
+				nil,      // args
+			)
+			failOnError(err, "Failed to register a consumer")
+			mb.msgs = msgs
+		})
 
 	t := New()
 	msg := <-mb.msgs
