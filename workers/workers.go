@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pydima/go-thumbnailer/config"
 	"github.com/pydima/go-thumbnailer/image"
 	"github.com/pydima/go-thumbnailer/image/backend"
 	"github.com/pydima/go-thumbnailer/models"
@@ -14,7 +15,7 @@ import (
 	"github.com/pydima/go-thumbnailer/utils"
 )
 
-func Run() {
+func run() {
 	tasksChan := make(chan *tasks.Task)
 	go func() {
 		for {
@@ -30,8 +31,14 @@ func Run() {
 			return
 		case t := <-tasksChan:
 			fmt.Println("Create task.")
-			go process(t)
+			process(t)
 		}
+	}
+}
+
+func Run() {
+	for x := 0; x < config.Base.Workers; x++ {
+		go run()
 	}
 }
 

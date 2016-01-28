@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/pydima/go-thumbnailer/config"
 	"github.com/streadway/amqp"
 )
 
@@ -35,10 +36,10 @@ func connection(name string) (conn *amqp.Connection, pubCh, subCh *amqp.Channel)
 	subCh, err = conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
-	err = subCh.Qos(100, 0, false)
+	err = subCh.Qos(config.Base.Workers, 0, false)
 	failOnError(err, "Failed to set Qos")
 
-	err = pubCh.Qos(100, 0, false)
+	err = pubCh.Qos(config.Base.Workers, 0, false)
 	failOnError(err, "Failed to set Qos")
 
 	_, err = pubCh.QueueDeclare(
