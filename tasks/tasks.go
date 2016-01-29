@@ -36,7 +36,7 @@ type ImageSource struct {
 type Task struct {
 	Images    []ImageSource
 	TaskID    string
-	UserID    string
+	ID        string
 	NotifyUrl string
 }
 

@@ -111,7 +111,7 @@ func process(t *tasks.Task) {
 		i = append(i, db_i.Path)
 	}
 
-	ack := utils.NewAck(t.NotifyUrl, t.UserID, i)
+	ack := utils.NewAck(t.NotifyUrl, t.ID, i)
 	go utils.Notify(ack)
 
 }
