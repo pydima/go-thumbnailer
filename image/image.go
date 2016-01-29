@@ -30,12 +30,6 @@ const (
 	GIF
 )
 
-type Image struct {
-	width  uint
-	height uint
-	path   string
-}
-
 type InvalidImage struct {
 	err string
 }

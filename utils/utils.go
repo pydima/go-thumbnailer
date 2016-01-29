@@ -11,8 +11,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/pydima/go-thumbnailer/image"
 )
 
 var Random *os.File
@@ -25,6 +23,16 @@ func init() {
 	}
 	Random = f
 	STOP = make(chan struct{})
+}
+
+type Ack struct {
+	url    string `json:"-"`
+	ID     string
+	Images []string
+}
+
+func NewAck(url, id string, images []string) *Ack {
+	return &Ack{url: url, ID: id, Images: images}
 }
 
 func UUID() string {
@@ -47,12 +55,12 @@ func DownloadImage(u string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func Notify(url string, images []image.Image) (err error) {
-	data, err := json.Marshal(images)
+func Notify(ack *Ack) (err error) {
+	data, err := json.Marshal(ack)
 	if err != nil {
 		return
 	}
-	http.Post(url, "application/json", bytes.NewReader(data))
+	http.Post(ack.url, "application/json", bytes.NewReader(data))
 	return
 }
 

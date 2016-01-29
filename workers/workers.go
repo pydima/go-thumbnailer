@@ -64,6 +64,7 @@ func getImage(is tasks.ImageSource) ([]byte, error) {
 
 func process(t *tasks.Task) {
 	defer tasks.Backend.Complete(t)
+	i := make([]string, 0)
 
 	for _, is := range t.Images {
 		db_i := models.Image{
@@ -107,8 +108,10 @@ func process(t *tasks.Task) {
 		db_i.Path = paths[0]
 
 		models.Db.Create(&db_i)
+		i = append(i, db_i.Path)
 	}
-	// var i []image.Image
-	// go utils.Notify(t.NotifyUrl, i)
+
+	ack := utils.NewAck(t.NotifyUrl, t.UserID, i)
+	go utils.Notify(ack)
 
 }
