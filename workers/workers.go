@@ -77,19 +77,9 @@ func process(t *tasks.Task) {
 			return
 		}
 
-		s := make(chan []byte, 1)
-		go func(is tasks.ImageSource) {
-			i, err := getImage(is)
-			if err != nil {
-				log.Println(err)
-				close(s)
-				return
-			}
-			s <- i
-		}(is)
-
-		res, ok := <-s
-		if !ok {
+		res, err := getImage(is)
+		if err != nil {
+			log.Println(err)
 			continue
 		}
 
