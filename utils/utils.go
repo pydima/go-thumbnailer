@@ -55,13 +55,32 @@ func DownloadImage(u string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func Notify(ack *Ack) (err error) {
+func Notify(ack *Ack, m ...time.Duration) (err error) {
+	var d time.Duration
+	if len(m) > 0 {
+		d = m[0]
+	} else {
+		d = time.Second
+	}
+
 	data, err := json.Marshal(ack)
 	if err != nil {
 		return
 	}
-	http.Post(ack.url, "application/json", bytes.NewReader(data))
-	return
+
+	delay := d * 0
+	attempts := 3
+	for x := attempts; x > 0; x-- {
+		<-time.After(delay)
+		_, err = http.Post(ack.url, "application/json", bytes.NewReader(data))
+		if err != nil {
+			log.Printf("got error %s when notified client", err)
+			delay = delay + d*1
+			continue
+		}
+		return
+	}
+	return fmt.Errorf("couldn't notify client, made %d attempts, got: %s", attempts, err)
 }
 
 func HandleSigTerm() {

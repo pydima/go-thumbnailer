@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -80,5 +81,16 @@ func TestNotify(t *testing.T) {
 			t.Errorf("wrong result, got: %s - expected: %s", urls, urlsResult)
 			break
 		}
+	}
+}
+
+func TestNotifyMultipleTimes(t *testing.T) {
+	urls := make([]string, 0)
+	urls = append(urls, "one")
+
+	ack := NewAck("http://localhost:12344/", "id_string", urls)
+
+	if err := Notify(ack, time.Millisecond); err == nil || !strings.Contains(err.Error(), "3 attempts") {
+		t.Errorf("Should have got an error with number of attempts to notify client, got %s", err)
 	}
 }
