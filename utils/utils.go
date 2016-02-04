@@ -89,7 +89,7 @@ func HandleSigTerm() {
 	go func() {
 		<-sigs
 		close(STOP)
-		time.Sleep(time.Second * 3)
-		os.Exit(0)
+		time.Sleep(time.Second * 15)
+		os.Exit(1)
 	}()
 }

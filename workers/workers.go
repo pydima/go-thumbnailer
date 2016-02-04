@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/pydima/go-thumbnailer/config"
 	"github.com/pydima/go-thumbnailer/image"
@@ -15,11 +16,28 @@ import (
 	"github.com/pydima/go-thumbnailer/utils"
 )
 
-func run() {
+func run(wg *sync.WaitGroup) {
+	defer wg.Done()
 	tasksChan := make(chan *tasks.Task)
 	go func() {
+		errorsInRow := 0
 		for {
-			t := tasks.Backend.Get()
+			t, err := tasks.Backend.Get()
+			if err != nil {
+				select {
+				case <-utils.STOP: // if got an error because of stopping process it's OK
+					return
+				default:
+					errorsInRow++
+					if errorsInRow > 30 {
+						log.Println("Got more than 30 errors in a row from the backend")
+						return
+					}
+					log.Println("Got the error: ", err.Error())
+					continue
+				}
+			}
+			errorsInRow = 0
 			tasksChan <- t
 		}
 	}()
@@ -30,16 +48,18 @@ func run() {
 			log.Println("Got signal, stop processing.")
 			return
 		case t := <-tasksChan:
-			fmt.Println("Create task.")
 			process(t)
 		}
 	}
 }
 
 func Run() {
+	var wg sync.WaitGroup
 	for x := 0; x < config.Base.Workers; x++ {
-		go run()
+		wg.Add(1)
+		go run(&wg)
 	}
+	wg.Wait()
 }
 
 func getImage(is tasks.ImageSource) ([]byte, error) {
