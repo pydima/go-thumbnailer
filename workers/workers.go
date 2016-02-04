@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/pydima/go-thumbnailer/config"
 	"github.com/pydima/go-thumbnailer/image"
@@ -92,9 +93,9 @@ func process(t *tasks.Task) {
 			Identifier:   is.Identifier,
 		}
 
-		if db_i.Exist() {
-			log.Println("This image is already exist.")
-			return
+		if path := db_i.PathIfExist(); path != "" { // found image into db
+			i = append(i, path)
+			continue
 		}
 
 		res, err := getImage(is)
@@ -111,7 +112,19 @@ func process(t *tasks.Task) {
 
 		paths, err := backend.ImageBackend.Save(thumbs)
 		if err != nil {
-			log.Printf("Shit happens.")
+			if linkErr, ok := err.(*os.LinkError); ok && linkErr.Err == syscall.ENOTEMPTY {
+				// directory with image already exists
+				if path := db_i.PathIfExist(); path != "" {
+					i = append(i, path)
+					continue
+				} else {
+					db_i.Path = linkErr.New
+					models.Db.Create(&db_i)
+					i = append(i, db_i.Path)
+					continue
+				}
+			}
+			log.Printf("Got error while saving thumbnails: %s", err.Error())
 			continue
 		}
 

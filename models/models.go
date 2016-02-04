@@ -19,6 +19,12 @@ func (i *Image) Exist() bool {
 	return !Db.Where(i).Find(&Image{}).RecordNotFound()
 }
 
+func (i *Image) PathIfExist() string {
+	img := new(Image)
+	Db.Where(i).Find(img)
+	return img.Path
+}
+
 var Db gorm.DB
 
 func init() {

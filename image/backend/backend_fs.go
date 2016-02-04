@@ -114,16 +114,7 @@ func (fb FSBackend) moveFiles(src, dst string) (err error) {
 		return
 	}
 
-	if err = os.Rename(src, dst); err != nil {
-		linkErr, ok := err.(*os.LinkError)
-		if !ok {
-			return
-		}
-		if linkErr.Err != syscall.ENOTEMPTY {
-			return
-		}
-	}
-	return
+	return os.Rename(src, dst)
 }
 
 func (fb FSBackend) Save(imgs map[string][]byte) ([]string, error) {
