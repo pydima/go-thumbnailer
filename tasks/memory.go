@@ -4,9 +4,9 @@ type MemoryBackend struct {
 	tasks chan *Task
 }
 
-func (mb *MemoryBackend) Get() *Task {
+func (mb *MemoryBackend) Get() (*Task, error) {
 	res := <-mb.tasks
-	return res
+	return res, nil
 }
 
 func (mb *MemoryBackend) Put(t *Task) {

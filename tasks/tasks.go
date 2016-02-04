@@ -41,7 +41,7 @@ type Task struct {
 }
 
 type Tasker interface {
-	Get() *Task
+	Get() (*Task, error)
 	Put(*Task)
 	Close()
 	Complete(*Task)
@@ -53,8 +53,8 @@ func NewBackend(bType string) (t Tasker, err error) {
 		t = &MemoryBackend{make(chan *Task, 100)}
 	case "RabbitMQ":
 		queue := "images"
-		conn, pubCh, subCh := connection(queue)
-		t = &RabbitMQBackend{conn: conn, pubChannel: pubCh, subChannel: subCh, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
+		conn, ch := connection(queue)
+		t = &RabbitMQBackend{conn: conn, channel: ch, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
 	default:
 		err = errors.New("Unknown backend.")
 	}

@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sync"
 
@@ -11,8 +12,7 @@ import (
 
 type RabbitMQBackend struct {
 	conn       *amqp.Connection
-	pubChannel *amqp.Channel
-	subChannel *amqp.Channel
+	channel    *amqp.Channel
 	queue      string
 	once       sync.Once
 	msgs       <-chan amqp.Delivery
@@ -25,24 +25,18 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func connection(name string) (conn *amqp.Connection, pubCh, subCh *amqp.Channel) {
+func connection(name string) (conn *amqp.Connection, ch *amqp.Channel) {
 	var err error
 	conn, err = amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 
-	pubCh, err = conn.Channel()
+	ch, err = conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
-	subCh, err = conn.Channel()
-	failOnError(err, "Failed to open a channel")
-
-	err = subCh.Qos(config.Base.Workers, 0, false)
+	err = ch.Qos(config.Base.Workers, 0, false)
 	failOnError(err, "Failed to set Qos")
 
-	err = pubCh.Qos(config.Base.Workers, 0, false)
-	failOnError(err, "Failed to set Qos")
-
-	_, err = pubCh.QueueDeclare(
+	_, err = ch.QueueDeclare(
 		name,  // name
 		true,  // durable
 		false, // delete when unused
@@ -51,13 +45,13 @@ func connection(name string) (conn *amqp.Connection, pubCh, subCh *amqp.Channel)
 		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
-	return conn, pubCh, subCh
+	return conn, ch
 }
 
-func (mb *RabbitMQBackend) Get() *Task {
+func (mb *RabbitMQBackend) Get() (*Task, error) {
 	mb.once.Do(
 		func() {
-			msgs, err := mb.subChannel.Consume(
+			msgs, err := mb.channel.Consume(
 				mb.queue, // queue
 				"",       // consumer
 				false,    // auto-ack
@@ -73,16 +67,19 @@ func (mb *RabbitMQBackend) Get() *Task {
 	t := New()
 	msg := <-mb.msgs
 	err := json.Unmarshal(msg.Body, t)
-	failOnError(err, "Failed to unmarshal data")
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal data: %s", err.Error())
+		return nil, err
+	}
 
 	mb.deliveries[t.TaskID] = &msg
-	return t
+	return t, nil
 }
 
 func (mb *RabbitMQBackend) Put(t *Task) {
 	data, err := json.Marshal(*t)
 	failOnError(err, "cannot marshal data")
-	err = mb.pubChannel.Publish(
+	err = mb.channel.Publish(
 		"",       // exchange
 		mb.queue, // routing key
 		false,    // mandatory
@@ -97,9 +94,12 @@ func (mb *RabbitMQBackend) Put(t *Task) {
 }
 
 func (mb *RabbitMQBackend) Close() {
-	mb.pubChannel.Close()
-	mb.subChannel.Close()
-	mb.conn.Close()
+	if mb.channel != nil {
+		mb.channel.Close()
+	}
+	if mb.conn != nil {
+		mb.conn.Close()
+	}
 }
 
 func (mb *RabbitMQBackend) Complete(t *Task) {

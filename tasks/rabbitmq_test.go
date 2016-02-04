@@ -12,18 +12,22 @@ var (
 )
 
 func init() {
-	conn, pubCh, subCh := connection(queue)
-	RabbitBackend = &RabbitMQBackend{conn: conn, pubChannel: pubCh, subChannel: subCh, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
+	conn, ch := connection(queue)
+	RabbitBackend = &RabbitMQBackend{conn: conn, channel: ch, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
 }
 
 func TestPutGetRabbitMQ(t *testing.T) {
-	defer RabbitBackend.pubChannel.QueuePurge(queue, true)
+	defer RabbitBackend.channel.QueuePurge(queue, true)
 
 	task := New()
 
 	go RabbitBackend.Put(task)
 
-	task2 := RabbitBackend.Get()
+	task2, err := RabbitBackend.Get()
+	if err != nil {
+		t.Errorf("Got error: %s", err.Error())
+		return
+	}
 
 	RabbitBackend.Complete(task2)
 
@@ -33,12 +37,16 @@ func TestPutGetRabbitMQ(t *testing.T) {
 }
 
 func TestRabbitAckLate(t *testing.T) {
-	defer RabbitBackend.pubChannel.QueuePurge(queue, true)
+	defer RabbitBackend.channel.QueuePurge(queue, true)
 
 	task := New()
 
 	go RabbitBackend.Put(task)
-	task2 := RabbitBackend.Get()
+	task2, err := RabbitBackend.Get()
+	if err != nil {
+		t.Errorf("Got error: %s", err.Error())
+		return
+	}
 
 	_, ok := RabbitBackend.deliveries[task.TaskID]
 	if !ok {

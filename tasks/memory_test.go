@@ -13,7 +13,7 @@ func TestPutGetMemory(t *testing.T) {
 	}
 
 	go b.Put(task)
-	task2 := b.Get()
+	task2, _ := b.Get()
 	if task.TaskID != task2.TaskID {
 		t.Error("Tasks are not the same.")
 	}

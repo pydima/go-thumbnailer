@@ -33,7 +33,11 @@ func TestCreateUser(t *testing.T) {
 		t.Errorf("Expected: %d", w.Code)
 	}
 
-	task2 := tasks.Backend.Get()
+	task2, err := tasks.Backend.Get()
+	if err != nil {
+		t.Errorf("Got error: %s", err.Error())
+	}
+
 	if task2.TaskID == "" {
 		t.Errorf("Tasks ID is empty.")
 	}
