@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/fvbock/endless"
+
 	"github.com/pydima/go-thumbnailer/config"
 	"github.com/pydima/go-thumbnailer/handlers"
 	"github.com/pydima/go-thumbnailer/tasks"
@@ -26,6 +28,6 @@ func main() {
 		http.HandleFunc("/thumbnail", handlers.CreateThumbnail)
 		host := config.Base.Host
 		port := config.Base.Port
-		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil))
+		log.Fatal(endless.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil))
 	}
 }
