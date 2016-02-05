@@ -11,6 +11,15 @@ type ImageBackender interface {
 	Save(imgs map[string][]byte) (paths []string, err error)
 }
 
+type AlreadyExistsError struct {
+	err  error
+	Path string
+}
+
+func (e *AlreadyExistsError) Error() string {
+	return e.err.Error()
+}
+
 var ImageBackend ImageBackender
 
 func init() {
