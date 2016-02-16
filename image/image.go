@@ -16,20 +16,22 @@ import (
 )
 
 var (
-	MARKER_JPG = []byte{0xff, 0xd8}
-	MARKER_PNG = []byte{0x89, 0x50}
-	MARKER_GIF = []byte{0x47, 0x49}
+	markerJPG = []byte{0xff, 0xd8}
+	markerPNG = []byte{0x89, 0x50}
+	markerGIF = []byte{0x47, 0x49}
 )
 
-type ImageType int
+type imageType int
 
+// UNKNOWN, JPG, PNG, GIF - constants which define type of image
 const (
-	UNKNOWN ImageType = iota
+	UNKNOWN imageType = iota
 	JPG
 	PNG
 	GIF
 )
 
+// InvalidImage - error for signaling about problem with image processing
 type InvalidImage struct {
 	err string
 }
@@ -42,7 +44,7 @@ func constructName(prefix, ext string) string {
 	return fmt.Sprintf("%s.%s", prefix, ext)
 }
 
-func CheckExtension(n string) error {
+func checkExtension(n string) error {
 	for _, ext := range config.Base.ValidExtensions {
 		if strings.HasSuffix(strings.ToLower(n), ext) {
 			return nil
@@ -51,24 +53,24 @@ func CheckExtension(n string) error {
 	return InvalidImage{fmt.Sprintf("Extension %s is not supported.", filepath.Ext(n))}
 }
 
-func ImageFormat(img []byte) ImageType {
+func imageFormat(img []byte) imageType {
 	if len(img) < 2 {
 		return UNKNOWN
 	}
 
 	switch {
-	case bytes.Equal(img[:2], MARKER_JPG):
+	case bytes.Equal(img[:2], markerJPG):
 		return JPG
-	case bytes.Equal(img[:2], MARKER_PNG):
+	case bytes.Equal(img[:2], markerPNG):
 		return PNG
-	case bytes.Equal(img[:2], MARKER_GIF):
+	case bytes.Equal(img[:2], markerGIF):
 		return GIF
 	default:
 		return UNKNOWN
 	}
 }
 
-func ImageDimensions(img []byte) (width, height int, err error) {
+func imageDimensions(img []byte) (width, height int, err error) {
 	r := bytes.NewReader(img)
 	conf, _, err := image.DecodeConfig(r)
 	return conf.Width, conf.Height, err
@@ -91,9 +93,9 @@ func convertGifToPng(img []byte) ([]byte, error) {
 	return res.Bytes(), nil
 }
 
-func ProcessImage(img []byte, ip config.ImageParam) (res []byte, err error) {
-	img_t := ImageFormat(img)
-	switch img_t {
+func processImage(img []byte, ip config.ImageParam) (res []byte, err error) {
+	imgT := imageFormat(img)
+	switch imgT {
 	case UNKNOWN:
 		return nil, fmt.Errorf("got unknown type")
 	case GIF:
@@ -118,9 +120,11 @@ func ProcessImage(img []byte, ip config.ImageParam) (res []byte, err error) {
 	return bimg.Resize(img, opts)
 }
 
+// CreateThumbnails generates from the source image (function's parameter)
+// all thumbnails specified in the config
 func CreateThumbnails(original []byte) (map[string][]byte, error) {
 	opts := config.Base.Thumbnails[0]
-	origThumbnail, err := ProcessImage(original, opts)
+	origThumbnail, err := processImage(original, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +132,7 @@ func CreateThumbnails(original []byte) (map[string][]byte, error) {
 	imgs[constructName(opts.Name, opts.Extension)] = origThumbnail
 
 	for _, v := range config.Base.Thumbnails[1:] {
-		img, err := ProcessImage(origThumbnail, v)
+		img, err := processImage(origThumbnail, v)
 		if err != nil {
 			return nil, err
 		}

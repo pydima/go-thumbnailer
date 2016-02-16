@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-func TestHandleSigTerm(t *testing.T) {
-	HandleSigTerm()
+func TestHandleSignals(t *testing.T) {
+	HandleSignals()
 	select {
 	case <-STOP:
 		t.Errorf("Got signal, didn't send it.")
@@ -35,7 +35,7 @@ func TestHandleSigTerm(t *testing.T) {
 }
 
 func TestNotify(t *testing.T) {
-	urls := make([]string, 0)
+	var urls []string
 	urls = append(urls, "one")
 	urls = append(urls, "two")
 	idExpected := "id_string"
@@ -76,7 +76,7 @@ func TestNotify(t *testing.T) {
 		return
 	}
 
-	for i, _ := range urls {
+	for i := range urls {
 		if urls[i] != urlsResult[i] {
 			t.Errorf("wrong result, got: %s - expected: %s", urls, urlsResult)
 			break
@@ -85,7 +85,7 @@ func TestNotify(t *testing.T) {
 }
 
 func TestNotifyMultipleTimes(t *testing.T) {
-	urls := make([]string, 0)
+	var urls []string
 	urls = append(urls, "one")
 
 	ack := NewAck("http://localhost:12344/", "id_string", urls)

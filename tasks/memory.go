@@ -1,19 +1,19 @@
 package tasks
 
-type MemoryBackend struct {
+type memoryBackend struct {
 	tasks chan *Task
 }
 
-func (mb *MemoryBackend) Get() (*Task, error) {
+func (mb *memoryBackend) Get() (*Task, error) {
 	res := <-mb.tasks
 	return res, nil
 }
 
-func (mb *MemoryBackend) Put(t *Task) {
+func (mb *memoryBackend) Put(t *Task) {
 	mb.tasks <- t
 	return
 }
 
-func (mb *MemoryBackend) Close() {}
+func (mb *memoryBackend) Close() {}
 
-func (mb *MemoryBackend) Complete(t *Task) {}
+func (mb *memoryBackend) Complete(t *Task) {}

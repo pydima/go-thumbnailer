@@ -53,6 +53,8 @@ func run(wg *sync.WaitGroup) {
 	}
 }
 
+// Run starts pool of goroutines which process tasks from
+// task backend.
 func Run() {
 	var wg sync.WaitGroup
 	for x := 0; x < config.Base.Workers; x++ {
@@ -72,27 +74,26 @@ func getImage(is tasks.ImageSource) ([]byte, error) {
 	if strings.HasPrefix(is.Path, "http") {
 		return utils.DownloadImage(is.Path)
 
-	} else {
-		img, err := os.Open(is.Path)
-		if err != nil {
-			return data, err
-		}
-		defer img.Close()
-		return ioutil.ReadAll(img)
 	}
+	img, err := os.Open(is.Path)
+	if err != nil {
+		return data, err
+	}
+	defer img.Close()
+	return ioutil.ReadAll(img)
 }
 
 func process(t *tasks.Task) {
 	defer tasks.Backend.Complete(t)
-	i := make([]string, 0)
+	var i []string
 
 	for _, is := range t.Images {
-		db_i := models.Image{
+		dbImage := models.Image{
 			OriginalPath: is.Path,
 			Identifier:   is.Identifier,
 		}
 
-		if path := db_i.PathIfExist(); path != "" { // found image into db
+		if path := dbImage.PathIfExist(); path != "" { // found image into db
 			i = append(i, path)
 			continue
 		}
@@ -113,22 +114,22 @@ func process(t *tasks.Task) {
 		if err != nil {
 			if existsError, ok := err.(*backend.AlreadyExistsError); ok {
 				// directory with image already exists
-				db_i.Path = existsError.Path
-				models.Db.Create(&db_i)
-				i = append(i, db_i.Path)
+				dbImage.Path = existsError.Path
+				models.Db.Create(&dbImage)
+				i = append(i, dbImage.Path)
 				continue
 			}
 			log.Printf("Got error while saving thumbnails: %s", err.Error())
 			continue
 		}
 
-		db_i.Path = paths[0]
+		dbImage.Path = paths[0]
 
-		models.Db.Create(&db_i)
-		i = append(i, db_i.Path)
+		models.Db.Create(&dbImage)
+		i = append(i, dbImage.Path)
 	}
 
-	ack := utils.NewAck(t.NotifyUrl, t.ID, i)
+	ack := utils.NewAck(t.NotifyURL, t.ID, i)
 	go utils.Notify(ack)
 
 }

@@ -12,12 +12,12 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	var image_source []tasks.ImageSource
+	var imageSource []tasks.ImageSource
 	task := tasks.New()
 
-	image_source = append(image_source, tasks.ImageSource{Path: "http://random_path_to_image.jpg", Identifier: ""})
-	task.Images = image_source
-	task.NotifyUrl = "http://localhost:8000/"
+	imageSource = append(imageSource, tasks.ImageSource{Path: "http://random_path_to_image.jpg", Identifier: ""})
+	task.Images = imageSource
+	task.NotifyURL = "http://localhost:8000/"
 
 	data, err := json.Marshal(task)
 	if err != nil {

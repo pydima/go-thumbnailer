@@ -13,7 +13,10 @@ import (
 	"time"
 )
 
-var Random *os.File
+var random *os.File
+
+// STOP is a channel which is closed when we need to
+// stop process, for example when we get a signal.
 var STOP chan struct{}
 
 func init() {
@@ -21,27 +24,32 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	Random = f
+	random = f
 	STOP = make(chan struct{})
 }
 
+// Ack contains all information for notifying client
+// that image processing task is finished
 type Ack struct {
 	url    string
 	ID     string
 	Images []string
 }
 
+// NewAck returns pointer to a new initialized Ack structure
 func NewAck(url, id string, images []string) *Ack {
 	return &Ack{url: url, ID: id, Images: images}
 }
 
+// UUID generates new ID for the task, it is used internally
 func UUID() string {
 	b := make([]byte, 16)
-	Random.Read(b)
+	random.Read(b)
 	return fmt.Sprintf("%x-%x-%x-%x-%x",
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
+// DownloadImage donwloads images from the url, and return downloaded image and error
 func DownloadImage(u string) ([]byte, error) {
 	var data []byte
 	resp, err := http.Get(u)
@@ -50,11 +58,13 @@ func DownloadImage(u string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return data, fmt.Errorf("error status code %d.", resp.StatusCode)
+		return data, fmt.Errorf("error status code %d", resp.StatusCode)
 	}
 	return ioutil.ReadAll(resp.Body)
 }
 
+// Notify is using Ack structure to notify client that images is processed
+// and provide information about image location
 func Notify(ack *Ack, m ...time.Duration) (err error) {
 	var d time.Duration
 	if len(m) > 0 {
@@ -83,7 +93,10 @@ func Notify(ack *Ack, m ...time.Duration) (err error) {
 	return fmt.Errorf("couldn't notify client, made %d attempts, got: %s", attempts, err)
 }
 
-func HandleSigTerm() {
+// HandleSignals receives OS signals and notifies goroutines
+// that they have to stop processing new tasks. To do this
+// functions just closes channel.
+func HandleSignals() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGINT)
 	go func() {

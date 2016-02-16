@@ -7,7 +7,7 @@ import (
 func TestPutGetMemory(t *testing.T) {
 	task := New()
 
-	b, err := NewBackend("Memory")
+	b, err := newBackend("Memory")
 	if err != nil {
 		t.Error(err)
 	}

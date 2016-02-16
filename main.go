@@ -22,7 +22,7 @@ func main() {
 	defer tasks.Backend.Close()
 
 	if *worker {
-		utils.HandleSigTerm()
+		utils.HandleSignals()
 		workers.Run()
 	} else {
 		http.HandleFunc("/thumbnail", handlers.CreateThumbnail)

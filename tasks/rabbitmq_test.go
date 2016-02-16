@@ -7,29 +7,29 @@ import (
 )
 
 var (
-	RabbitBackend *RabbitMQBackend
-	queue         string = "test_images_queue"
+	rabbitBackend *rabbitMQBackend
+	queue         = "test_images_queue"
 )
 
 func init() {
 	conn, ch := connection(queue)
-	RabbitBackend = &RabbitMQBackend{conn: conn, channel: ch, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
+	rabbitBackend = &rabbitMQBackend{conn: conn, channel: ch, queue: queue, deliveries: make(map[string]*amqp.Delivery)}
 }
 
 func TestPutGetRabbitMQ(t *testing.T) {
-	defer RabbitBackend.channel.QueuePurge(queue, true)
+	defer rabbitBackend.channel.QueuePurge(queue, true)
 
 	task := New()
 
-	go RabbitBackend.Put(task)
+	go rabbitBackend.Put(task)
 
-	task2, err := RabbitBackend.Get()
+	task2, err := rabbitBackend.Get()
 	if err != nil {
 		t.Errorf("Got error: %s", err.Error())
 		return
 	}
 
-	RabbitBackend.Complete(task2)
+	rabbitBackend.Complete(task2)
 
 	if task.TaskID != task2.TaskID {
 		t.Errorf("Tasks are not the same. (%s -> %s)", task.TaskID, task2.TaskID)
@@ -37,25 +37,25 @@ func TestPutGetRabbitMQ(t *testing.T) {
 }
 
 func TestRabbitAckLate(t *testing.T) {
-	defer RabbitBackend.channel.QueuePurge(queue, true)
+	defer rabbitBackend.channel.QueuePurge(queue, true)
 
 	task := New()
 
-	go RabbitBackend.Put(task)
-	task2, err := RabbitBackend.Get()
+	go rabbitBackend.Put(task)
+	task2, err := rabbitBackend.Get()
 	if err != nil {
 		t.Errorf("Got error: %s", err.Error())
 		return
 	}
 
-	_, ok := RabbitBackend.deliveries[task.TaskID]
+	_, ok := rabbitBackend.deliveries[task.TaskID]
 	if !ok {
 		t.Errorf("Couldn't find row in deliveries.")
 	}
 
-	RabbitBackend.Complete(task2)
+	rabbitBackend.Complete(task2)
 
-	_, ok = RabbitBackend.deliveries[task.TaskID]
+	_, ok = rabbitBackend.deliveries[task.TaskID]
 	if ok {
 		t.Errorf("Found row in deliveries.")
 	}

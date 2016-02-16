@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var backend FSBackend
+var backend backendFS
 
 func init() {
 	path, _ := os.Getwd()
@@ -18,7 +18,7 @@ func init() {
 	if err != nil {
 		log.Fatalln("Something went wrong. ", err)
 	}
-	backend = FSBackend{
+	backend = backendFS{
 		BasePath: p,
 		TmpDir:   filepath.Join(p, "tmp"),
 	}

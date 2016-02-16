@@ -40,31 +40,31 @@ func imageGC(tmpDir string) error {
 	return nil
 }
 
-type FSBackend struct {
+type backendFS struct {
 	BasePath string
 	TmpDir   string
 }
 
-func (fb FSBackend) generatePath(hash string) (path string) {
+func (fb backendFS) generatePath(hash string) (path string) {
 	return filepath.Join(fb.BasePath, hash[:2], hash[2:4], hash[4:6], hash[6:])
 }
 
-func (fb FSBackend) exists(path string) bool {
+func (fb backendFS) exists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
 	return true
 }
 
-func (fb FSBackend) generateDest(imgs map[string][]byte, basePath string) []string {
+func (fb backendFS) generateDest(imgs map[string][]byte, basePath string) []string {
 	res := make([]string, 0, len(imgs))
-	for k, _ := range imgs {
+	for k := range imgs {
 		res = append(res, filepath.Join(basePath, k))
 	}
 	return res
 }
 
-func (fb FSBackend) createTmpDir() (tmpDir string, err error) {
+func (fb backendFS) createTmpDir() (tmpDir string, err error) {
 	tmpDir, err = ioutil.TempDir(fb.TmpDir, time.Now().Format(time.RFC3339)+"_")
 
 	if err != nil {
@@ -75,22 +75,21 @@ func (fb FSBackend) createTmpDir() (tmpDir string, err error) {
 
 		if pathErr.Err != syscall.ENOENT {
 			return
-		} else {
+		}
 
-			if err = os.MkdirAll(fb.TmpDir, 0755); err != nil {
-				return
-			}
+		if err = os.MkdirAll(fb.TmpDir, 0755); err != nil {
+			return
+		}
 
-			tmpDir, err = ioutil.TempDir(fb.TmpDir, time.Now().Format(time.RFC3339)+"_")
-			if err != nil {
-				return
-			}
+		tmpDir, err = ioutil.TempDir(fb.TmpDir, time.Now().Format(time.RFC3339)+"_")
+		if err != nil {
+			return
 		}
 	}
 	return tmpDir, nil
 }
 
-func (fb FSBackend) baseImage(imgs map[string][]byte) ([]byte, error) {
+func (fb backendFS) baseImage(imgs map[string][]byte) ([]byte, error) {
 	var img []byte
 
 	for k, v := range imgs {
@@ -101,13 +100,13 @@ func (fb FSBackend) baseImage(imgs map[string][]byte) ([]byte, error) {
 	}
 
 	if img == nil {
-		return nil, fmt.Errorf("cannot find original image.")
+		return nil, fmt.Errorf("cannot find original image")
 	}
 
 	return img, nil
 }
 
-func (fb FSBackend) moveFiles(src, dst string) (err error) {
+func (fb backendFS) moveFiles(src, dst string) (err error) {
 	parentDir := filepath.Dir(dst)
 	err = os.MkdirAll(parentDir, 0755)
 	if err != nil {
@@ -123,7 +122,7 @@ func (fb FSBackend) moveFiles(src, dst string) (err error) {
 	return
 }
 
-func (fb FSBackend) Save(imgs map[string][]byte) ([]string, error) {
+func (fb backendFS) Save(imgs map[string][]byte) ([]string, error) {
 	img, err := fb.baseImage(imgs)
 	if err != nil {
 		return nil, err

@@ -8,6 +8,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Image contains information with path to the processed image
+// and information about the source and time when the image was downloaded
 type Image struct {
 	OriginalPath string `gorm:"primary_key" sql:"type:varchar(255)"`
 	Identifier   string `gorm:"primary_key" sql:"type:varchar(255)"`
@@ -15,16 +17,20 @@ type Image struct {
 	CreatedAt    time.Time
 }
 
+// Exist check if image with given url and identifier exists
 func (i *Image) Exist() bool {
 	return !Db.Where(i).Find(&Image{}).RecordNotFound()
 }
 
+// PathIfExist returns path to the processed thumbnails
+// if we have this information into the db
 func (i *Image) PathIfExist() string {
 	img := new(Image)
 	Db.Where(i).Find(img)
 	return img.Path
 }
 
+// Db is a singleton with connection to the db
 var Db gorm.DB
 
 func init() {

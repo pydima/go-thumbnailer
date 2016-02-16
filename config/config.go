@@ -9,6 +9,7 @@ import (
 	"github.com/h2non/bimg"
 )
 
+// Config contains all application settings
 type Config struct {
 	TaskBackend     string
 	ImageBackend    string
@@ -21,12 +22,14 @@ type Config struct {
 	Workers         int
 }
 
+// ImageParam contains all settings for creating thumbnail
 type ImageParam struct {
 	bimg.Options
 	Name      string
 	Extension string
 }
 
+// SupportedExtensions contains all allowed extensions for source files
 var SupportedExtensions = map[string]bool{
 	"jpg":  true,
 	"jpeg": true,
@@ -34,12 +37,15 @@ var SupportedExtensions = map[string]bool{
 	"gif":  true,
 }
 
+// StringToBimgType maps human-readable extension to constant
+// for bimg library
 var StringToBimgType = map[string]bimg.ImageType{
 	"jpg":  1,
 	"jpeg": 1,
 	"png":  3,
 }
 
+// Base is a singleton class with current application's settings
 var Base Config
 
 func decodeConfig(path string, c *Config) (err error) {

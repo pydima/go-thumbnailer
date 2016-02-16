@@ -8,7 +8,7 @@ import (
 	"github.com/pydima/go-thumbnailer/config"
 )
 
-var bimgOptions bimg.Options = bimg.Options{
+var bimgOptions = bimg.Options{
 	Width:      800,
 	Height:     600,
 	Enlarge:    true,
@@ -17,7 +17,7 @@ var bimgOptions bimg.Options = bimg.Options{
 	Type:       3, // png
 }
 
-var options config.ImageParam = config.ImageParam{
+var options = config.ImageParam{
 	Options:   bimgOptions,
 	Name:      "test",
 	Extension: "png",
@@ -31,7 +31,7 @@ func BenchmarkProcessImageGif(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		ProcessImage(img, options)
+		processImage(img, options)
 	}
 }
 
@@ -43,7 +43,7 @@ func BenchmarkProcessImagePng(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		ProcessImage(img, options)
+		processImage(img, options)
 	}
 }
 
@@ -55,11 +55,11 @@ func BenchmarkProcessImageJpg(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		ProcessImage(img, options)
+		processImage(img, options)
 	}
 }
 
-func BenchmarkCreatheThumbnailImagePng(b *testing.B) {
+func BenchmarkCreateThumbnailImagePng(b *testing.B) {
 	img, err := ioutil.ReadFile("/go/src/github.com/pydima/go-thumbnailer/testdata/png.png")
 	if err != nil {
 		b.Fatalf("Cannot read the test file")

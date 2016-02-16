@@ -13,17 +13,17 @@ import (
 
 func TestCheckExtension(t *testing.T) {
 	config.Base.ValidExtensions = []string{"jpg"}
-	err := CheckExtension("file.jpg")
+	err := checkExtension("file.jpg")
 	if err != nil {
 		t.Errorf("Cannot detect valid extension.")
 	}
 
-	err = CheckExtension("file.svg")
+	err = checkExtension("file.svg")
 	if err == nil {
 		t.Errorf("Detect invalid extension.")
 	}
 
-	err = CheckExtension("file.JPG")
+	err = checkExtension("file.JPG")
 	if err != nil {
 		t.Errorf("Cannot detect extension in uppercase.")
 	}
@@ -51,33 +51,33 @@ func TestConstructName(t *testing.T) {
 
 func TestImageFormat(t *testing.T) {
 	b := readAndCheckFile("jpg.jpg", t)
-	if f := ImageFormat(b); f != JPG {
+	if f := imageFormat(b); f != JPG {
 		t.Errorf("Invalid detection of jpg file.")
 	}
 
 	b = readAndCheckFile("png.png", t)
-	if f := ImageFormat(b); f != PNG {
+	if f := imageFormat(b); f != PNG {
 		t.Errorf("Invalid detection of png file.")
 	}
 
 	b = readAndCheckFile("gif.gif", t)
-	if f := ImageFormat(b); f != GIF {
+	if f := imageFormat(b); f != GIF {
 		t.Errorf("Invalid detection of gif file.")
 	}
 
 	b = readAndCheckFile("bmp.bmp", t)
-	if f := ImageFormat(b); f != UNKNOWN {
+	if f := imageFormat(b); f != UNKNOWN {
 		t.Errorf("Invalid detection of unknown file format.")
 	}
 
 	var bt []byte
-	if f := ImageFormat(bt); f != UNKNOWN {
+	if f := imageFormat(bt); f != UNKNOWN {
 		t.Errorf("Invalid detection of unknown file format.")
 	}
 }
 
 func checkDimensions(b []byte, width, height int, t *testing.T, exact bool) {
-	w, h, err := ImageDimensions(b)
+	w, h, err := imageDimensions(b)
 	if err != nil {
 		t.Errorf("Cannot get dimensions.")
 		return
@@ -110,7 +110,7 @@ func TestGetImageDimensions(t *testing.T) {
 	checkDimensions(b, 1634, 2224, t, true)
 
 	b = readAndCheckFile("bmp.bmp", t)
-	_, _, err := ImageDimensions(b)
+	_, _, err := imageDimensions(b)
 	if err == nil {
 		t.Errorf("Should return an error, since cannot get dimensions.")
 	}
@@ -122,7 +122,7 @@ func TestConvertGifToPng(t *testing.T) {
 	if err != nil {
 		t.Errorf("Cannot convert image to png.")
 	}
-	if f := ImageFormat(res); f != PNG {
+	if f := imageFormat(res); f != PNG {
 		t.Errorf("Convertation failed.")
 	}
 
@@ -164,7 +164,7 @@ func TestConvertJpgToPng(t *testing.T) {
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}
-	if f := ImageFormat(res); f != PNG {
+	if f := imageFormat(res); f != PNG {
 		t.Errorf("Invalid image format.")
 	}
 }
@@ -181,11 +181,11 @@ func TestProcessImage(t *testing.T) {
 	b := readAndCheckFile("gif.gif", t)
 	ip := config.ImageParam{Name: "test", Extension: "png"}
 	ip.Options = options
-	res, err := ProcessImage(b, ip)
+	res, err := processImage(b, ip)
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}
-	if f := ImageFormat(res); f != PNG {
+	if f := imageFormat(res); f != PNG {
 		t.Errorf("Invalid image format.")
 	}
 	checkDimensions(res, 100, 100, t, false)
@@ -203,13 +203,13 @@ func TestCreateThumbnails(t *testing.T) {
 	}
 
 	for k, img := range res {
-		var it ImageType
+		var it imageType
 		if strings.HasPrefix(k, "original") {
 			it = PNG
 		} else {
 			it = JPG
 		}
-		if f := ImageFormat(img); f != it {
+		if f := imageFormat(img); f != it {
 			t.Errorf("Invalid image format, got %d expected %d.", f, it)
 		}
 	}

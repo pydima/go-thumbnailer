@@ -8,6 +8,7 @@ import (
 	"github.com/pydima/go-thumbnailer/utils"
 )
 
+// CreateThumbnail API resource for creating thumbnails
 func CreateThumbnail(w http.ResponseWriter, r *http.Request) {
 	t := tasks.New()
 	d := json.NewDecoder(r.Body)

@@ -10,7 +10,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type RabbitMQBackend struct {
+type rabbitMQBackend struct {
 	conn       *amqp.Connection
 	channel    *amqp.Channel
 	queue      string
@@ -48,7 +48,7 @@ func connection(name string) (conn *amqp.Connection, ch *amqp.Channel) {
 	return conn, ch
 }
 
-func (mb *RabbitMQBackend) Get() (*Task, error) {
+func (mb *rabbitMQBackend) Get() (*Task, error) {
 	mb.once.Do(
 		func() {
 			msgs, err := mb.channel.Consume(
@@ -76,7 +76,7 @@ func (mb *RabbitMQBackend) Get() (*Task, error) {
 	return t, nil
 }
 
-func (mb *RabbitMQBackend) Put(t *Task) {
+func (mb *rabbitMQBackend) Put(t *Task) {
 	data, err := json.Marshal(*t)
 	failOnError(err, "cannot marshal data")
 	err = mb.channel.Publish(
@@ -93,7 +93,7 @@ func (mb *RabbitMQBackend) Put(t *Task) {
 	return
 }
 
-func (mb *RabbitMQBackend) Close() {
+func (mb *rabbitMQBackend) Close() {
 	if mb.channel != nil {
 		mb.channel.Close()
 	}
@@ -102,7 +102,7 @@ func (mb *RabbitMQBackend) Close() {
 	}
 }
 
-func (mb *RabbitMQBackend) Complete(t *Task) {
+func (mb *rabbitMQBackend) Complete(t *Task) {
 	d, ok := mb.deliveries[t.TaskID]
 	if !ok {
 		return
