@@ -26,7 +26,7 @@ func init() {
 }
 
 type Ack struct {
-	url    string `json:"-"`
+	url    string
 	ID     string
 	Images []string
 }

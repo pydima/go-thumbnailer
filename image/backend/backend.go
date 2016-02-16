@@ -3,8 +3,10 @@ package backend
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/pydima/go-thumbnailer/config"
+	"github.com/pydima/go-thumbnailer/utils"
 )
 
 type ImageBackender interface {
@@ -38,6 +40,18 @@ func NewBackend(bType string) (t ImageBackender, err error) {
 			BasePath: config.Base.MediaRoot,
 			TmpDir:   config.Base.TmpDir,
 		}
+		ticker := time.NewTicker(10 * time.Minute)
+		go func() {
+			for {
+				select {
+				case <-ticker.C:
+					imageGC(config.Base.TmpDir)
+				case <-utils.STOP:
+					ticker.Stop()
+					return
+				}
+			}
+		}()
 	default:
 		err = errors.New("Unknown backend.")
 	}
