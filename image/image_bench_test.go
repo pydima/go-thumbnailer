@@ -5,15 +5,22 @@ import (
 	"testing"
 
 	"github.com/h2non/bimg"
+	"github.com/pydima/go-thumbnailer/config"
 )
 
-var options bimg.Options = bimg.Options{
+var bimgOptions bimg.Options = bimg.Options{
 	Width:      800,
 	Height:     600,
 	Enlarge:    true,
 	Quality:    95,
 	Background: bimg.Color{R: 255, G: 255, B: 255},
 	Type:       3, // png
+}
+
+var options config.ImageParam = config.ImageParam{
+	Options:   bimgOptions,
+	Name:      "test",
+	Extension: "png",
 }
 
 func BenchmarkProcessImageGif(b *testing.B) {

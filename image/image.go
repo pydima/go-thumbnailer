@@ -38,17 +38,8 @@ func (e InvalidImage) Error() string {
 	return e.err
 }
 
-func constructName(prefix string, img []byte) string {
-	switch ImageFormat(img) {
-	case GIF:
-		return prefix + ".gif"
-	case JPG:
-		return prefix + ".jpg"
-	case PNG:
-		return prefix + ".png"
-	default:
-		return ""
-	}
+func constructName(prefix, ext string) string {
+	return fmt.Sprintf("%s.%s", prefix, ext)
 }
 
 func CheckExtension(n string) error {
@@ -100,7 +91,7 @@ func convertGifToPng(img []byte) ([]byte, error) {
 	return res.Bytes(), nil
 }
 
-func ProcessImage(img []byte, opts bimg.Options) (res []byte, err error) {
+func ProcessImage(img []byte, ip config.ImageParam) (res []byte, err error) {
 	img_t := ImageFormat(img)
 	switch img_t {
 	case UNKNOWN:
@@ -111,6 +102,9 @@ func ProcessImage(img []byte, opts bimg.Options) (res []byte, err error) {
 			return nil, err
 		}
 	}
+
+	opts := ip.Options
+	opts.Type = config.StringToBimgType[ip.Extension]
 
 	meta, err := bimg.Metadata(img)
 	if err != nil {
@@ -125,24 +119,20 @@ func ProcessImage(img []byte, opts bimg.Options) (res []byte, err error) {
 }
 
 func CreateThumbnails(original []byte) (map[string][]byte, error) {
-	opts := bimg.Options(config.Base.ImageParam)
-
+	opts := config.Base.Thumbnails[0]
 	origThumbnail, err := ProcessImage(original, opts)
 	if err != nil {
 		return nil, err
 	}
 	imgs := make(map[string][]byte)
-	imgs[constructName("original", origThumbnail)] = origThumbnail
+	imgs[constructName(opts.Name, opts.Extension)] = origThumbnail
 
-	for k, v := range config.Base.Thumbnails {
-		opts.Width = v[0]
-		opts.Height = v[1]
-		opts.Type = 1
-		img, err := ProcessImage(origThumbnail, opts)
+	for _, v := range config.Base.Thumbnails[1:] {
+		img, err := ProcessImage(origThumbnail, v)
 		if err != nil {
 			return nil, err
 		}
-		imgs[constructName(k, img)] = img
+		imgs[constructName(v.Name, v.Extension)] = img
 	}
 
 	return imgs, nil

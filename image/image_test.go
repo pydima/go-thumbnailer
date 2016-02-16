@@ -41,9 +41,9 @@ func readAndCheckFile(name string, t *testing.T) []byte {
 func TestConstructName(t *testing.T) {
 	images := []string{"jpg.jpg", "png.png", "gif.gif"}
 	for _, i := range images {
-		b := readAndCheckFile(i, t)
 		want := i
-		if res := constructName(strings.Split(i, ".")[0], b); res != want {
+		name := strings.Split(i, ".")
+		if res := constructName(name[0], name[1]); res != want {
 			t.Errorf("constructName(); want - %s, get - %s", want, res)
 		}
 	}
@@ -179,7 +179,9 @@ func TestProcessImage(t *testing.T) {
 		Type:       3,
 	}
 	b := readAndCheckFile("gif.gif", t)
-	res, err := ProcessImage(b, options)
+	ip := config.ImageParam{Name: "test", Extension: "png"}
+	ip.Options = options
+	res, err := ProcessImage(b, ip)
 	if err != nil {
 		t.Errorf("Got error: %s", err)
 	}
@@ -208,7 +210,7 @@ func TestCreateThumbnails(t *testing.T) {
 			it = JPG
 		}
 		if f := ImageFormat(img); f != it {
-			t.Errorf("Invalid image format.")
+			t.Errorf("Invalid image format, got %d expected %d.", f, it)
 		}
 	}
 }
