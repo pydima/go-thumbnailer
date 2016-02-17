@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -52,13 +53,14 @@ func UUID() string {
 // DownloadImage donwloads images from the url, and return downloaded image and error
 func DownloadImage(u string) ([]byte, error) {
 	var data []byte
+	u = strings.TrimSpace(u)
 	resp, err := http.Get(u)
 	if err != nil {
 		return data, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return data, fmt.Errorf("error status code %d", resp.StatusCode)
+		return data, fmt.Errorf("error status code %d, url: `%s`", resp.StatusCode, u)
 	}
 	return ioutil.ReadAll(resp.Body)
 }
@@ -66,6 +68,10 @@ func DownloadImage(u string) ([]byte, error) {
 // Notify is using Ack structure to notify client that images is processed
 // and provide information about image location
 func Notify(ack *Ack, m ...time.Duration) (err error) {
+	if ack.url == "" {
+		return
+	}
+
 	var d time.Duration
 	if len(m) > 0 {
 		d = m[0]

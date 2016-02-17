@@ -1,5 +1,5 @@
 {
-	"TaskBackend": "Memory",
+	"TaskBackend": "RabbitMQ",
 	"ImageBackend": "FS",
 	"TmpDir": "/tmp",
 	"MediaRoot": "/tmp/images",
@@ -19,6 +19,7 @@
 	    {   
 	        "Width": 254,
 	        "Height": 254,
+	        "Enlarge": true,
 	        "Quality": 95,
 	        "Name": "254x254",
 	        "Extension": "jpg"
@@ -26,6 +27,7 @@
 	    {   
 	        "Width": 138,
 	        "Height": 138,
+	        "Enlarge": true,
 	        "Quality": 95,
 	        "Name": "138x138",
 	        "Extension": "jpg"
@@ -33,6 +35,7 @@
 	    {   
 	        "Width": 126,
 	        "Height": 126,
+	        "Enlarge": true,
 	        "Quality": 95,
 	        "Name": "126x126",
 	        "Extension": "jpg"
@@ -40,6 +43,7 @@
 	    {   
 	        "Width": 80,
 	        "Height": 80,
+	        "Enlarge": true,
 	        "Quality": 95,
 	        "Name": "80x80",
 	        "Extension": "jpg"
@@ -47,6 +51,7 @@
 	    {   
 	        "Width": 50,
 	        "Height": 50,
+	        "Enlarge": true,
 	        "Quality": 95,
 	        "Name": "50x50",
 	        "Extension": "jpg"
