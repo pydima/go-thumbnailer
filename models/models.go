@@ -17,7 +17,7 @@ type Image struct {
 	CreatedAt    time.Time
 }
 
-// Exist check if image with given url and identifier exists
+// Exist check if image with given URL and identifier exists
 func (i *Image) Exist() bool {
 	return !Db.Where(i).Find(&Image{}).RecordNotFound()
 }

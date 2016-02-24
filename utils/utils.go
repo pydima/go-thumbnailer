@@ -50,7 +50,7 @@ func UUID() string {
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
-// DownloadImage donwloads images from the url, and return downloaded image and error
+// DownloadImage downloads images from the URL, and return downloaded image and error
 func DownloadImage(u string) ([]byte, error) {
 	var data []byte
 	u = strings.TrimSpace(u)

@@ -7,55 +7,55 @@
 	"Port": 8080,
 	"ValidExtensions": ["jpg", "jpeg", "png"],
 	"Thumbnails": [
-	    {   
-	        "Width": 600,
-	        "Height": 800,
-	        "Enlarge": true,
-	        "Quality": 100,
-	        "Background": {"R": 255, "G": 255, "B": 255},
-	        "Name": "original",
-	        "Extension": "png"
-	    },
-	    {   
-	        "Width": 254,
-	        "Height": 254,
-	        "Enlarge": true,
-	        "Quality": 95,
-	        "Name": "254x254",
-	        "Extension": "jpg"
-	    },
-	    {   
-	        "Width": 138,
-	        "Height": 138,
-	        "Enlarge": true,
-	        "Quality": 95,
-	        "Name": "138x138",
-	        "Extension": "jpg"
-	    },
-	    {   
-	        "Width": 126,
-	        "Height": 126,
-	        "Enlarge": true,
-	        "Quality": 95,
-	        "Name": "126x126",
-	        "Extension": "jpg"
-	    },
-	    {   
-	        "Width": 80,
-	        "Height": 80,
-	        "Enlarge": true,
-	        "Quality": 95,
-	        "Name": "80x80",
-	        "Extension": "jpg"
-	    },
-	    {   
-	        "Width": 50,
-	        "Height": 50,
-	        "Enlarge": true,
-	        "Quality": 95,
-	        "Name": "50x50",
-	        "Extension": "jpg"
-	    }
+		{
+			"Width": 600,
+			"Height": 800,
+			"Enlarge": true,
+			"Quality": 100,
+			"Background": {"R": 255, "G": 255, "B": 255},
+			"Name": "original",
+			"Extension": "png"
+		},
+		{
+			"Width": 254,
+			"Height": 254,
+			"Enlarge": true,
+			"Quality": 95,
+			"Name": "254x254",
+			"Extension": "jpg"
+		},
+		{
+			"Width": 138,
+			"Height": 138,
+			"Enlarge": true,
+			"Quality": 95,
+			"Name": "138x138",
+			"Extension": "jpg"
+		},
+		{
+			"Width": 126,
+			"Height": 126,
+			"Enlarge": true,
+			"Quality": 95,
+			"Name": "126x126",
+			"Extension": "jpg"
+		},
+		{
+			"Width": 80,
+			"Height": 80,
+			"Enlarge": true,
+			"Quality": 95,
+			"Name": "80x80",
+			"Extension": "jpg"
+		},
+		{
+			"Width": 50,
+			"Height": 50,
+			"Enlarge": true,
+			"Quality": 95,
+			"Name": "50x50",
+			"Extension": "jpg"
+		}
 	],
 	"Workers": 100
 }
