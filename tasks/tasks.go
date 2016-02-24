@@ -11,7 +11,7 @@ import (
 )
 
 // Backend is a singleton with current implementation
-// of Tasker interface, implemenation is specified in the config
+// of Tasker interface, implementation is specified in the config
 var Backend Tasker
 
 func init() {
@@ -31,10 +31,10 @@ func New() *Task {
 	}
 }
 
-// ImageSource contains url with a source image and image's identifier
-// which might be used to download image from the url which we already
-// processed. For example, if the image from url changes and we want to
-// update data, it's possible to just specify the same url with a
+// ImageSource contains URL with a source image and image's identifier
+// which might be used to download image from the URL which we already
+// processed. For example, if the image from URL changes and we want to
+// update data, it's possible to just specify the same URL with a
 // different identifier.
 type ImageSource struct {
 	Path       string

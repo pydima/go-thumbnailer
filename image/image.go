@@ -76,7 +76,7 @@ func imageDimensions(img []byte) (width, height int, err error) {
 	return conf.Width, conf.Height, err
 }
 
-// vips doesn't support gif natively, so have to convert it with slow standart library
+// vips doesn't support gif natively, so have to convert it with slow standard library
 func convertGifToPng(img []byte) ([]byte, error) {
 	r := bytes.NewReader(img)
 	i, err := gif.Decode(r)
